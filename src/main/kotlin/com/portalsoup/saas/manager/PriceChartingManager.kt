@@ -3,6 +3,7 @@ package com.portalsoup.saas.manager
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.server.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -35,6 +36,8 @@ class PriceChartingManager {
                 }
             }
         }
+
+        tmpFile.copyTo(File("/home/portalsoup"), false)
     }
 
     companion object {

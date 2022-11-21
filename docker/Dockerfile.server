@@ -6,6 +6,4 @@ COPY ./build/libs/shadow.jar /app/
 
 WORKDIR /app
 
-RUN ls -l
-
 ENTRYPOINT java -jar shadow.jar

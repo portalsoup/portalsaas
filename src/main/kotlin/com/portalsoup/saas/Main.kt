@@ -1,5 +1,6 @@
 package com.portalsoup.saas
 
+import com.portalsoup.saas.core.Retrier
 import com.portalsoup.saas.core.configureRouting
 import com.portalsoup.saas.core.configureSerialization
 import com.portalsoup.saas.schedule.PriceChartingUpdater
@@ -9,19 +10,35 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.flywaydb.core.Flyway
 
-val dbConfig = HikariConfig().apply {
-    jdbcUrl = ""
-    driverClassName = ""
-    username = ""
-    password = ""
-    maximumPoolSize = 10
-}
-
-val dataSource = HikariDataSource(dbConfig)
-
 fun main() {
+    println("Entered main")
+
+    val dbConfig = HikariConfig().apply {
+        jdbcUrl = System.getenv("JDBC_URL")
+        driverClassName = System.getenv("JDBC_DRIVER")
+        username = System.getenv("JDBC_USERNAME")
+        password = System.getenv("JDBC_PASSWORD")
+        maximumPoolSize = System.getenv("JDBC_MAX_POOL").toInt()
+        connectionTestQuery = "SELECT 1"
+    }
+
+    println("validating dbconfig")
+    dbConfig.validate()
+
+    println("about to get data source")
+    val dataSource: HikariDataSource = Retrier("initialize-hikari") {
+        println("trying to get data source...")
+        HikariDataSource(dbConfig)
+    }
+    println("got data source")
+
     PriceChartingUpdater().startScheduler()
-    Flyway.configure().dataSource(dataSource).load().migrate()
+    println("about to start migration")
+    Retrier("flyway-migration") {
+        println("trying to migrate db...")
+        Flyway.configure().dataSource(dataSource).load().migrate()
+    }
+    println("got past retries")
     initKtor()
 }
 

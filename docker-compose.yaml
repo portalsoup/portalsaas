@@ -1,4 +1,12 @@
 version: '3.7'
+
+x-jdbc-config: &db-config
+  JDBC_URL: "jdbc:postgresql://db:5432/app"
+  JDBC_DRIVER: "org.postgresql.Driver"
+  JDBC_USERNAME: "postgres"
+  JDBC_PASSWORD: "tour"
+  JDBC_MAX_POOL: "10"
+
 services:
   app:
     build:
@@ -6,6 +14,8 @@ services:
       dockerfile: docker/Dockerfile.server
     networks:
       - server
+    environment:
+      <<: *db-config
     ports:
       - "8080:8080"
     depends_on:
@@ -14,23 +24,15 @@ services:
     image: postgres:alpine
     ports:
       - "5432:5432"
-    volumes:
-      - vdata:/var/lib/postgresql
+#    volumes:
+#      - vdata:/var/lib/postgresql
     environment:
-      POSTGRES_USER: bikes
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: tour
       POSTGRES_DB: app
     restart: always
     networks:
       - server
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: someone@notreal.com
-#      PGADMIN_DEFAULT_PASSWORD: oohsosecure
-#      PGADMIN_LISTEN_PORT: 81
-#    depends_on:
-#      - db
 volumes:
   vdata: {}
 networks:

@@ -21,6 +21,7 @@ class PriceChartingUpdater {
             // make api call
             println("Tick ${atomicInt.incrementAndGet()}")
             PriceChartingManager().requestCsv()
+            println("got csv")
         }
     }
 

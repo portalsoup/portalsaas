@@ -5,6 +5,7 @@ plugins {
     application
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("plugin.serialization") version "1.7.21"
+    id("org.flywaydb.flyway") version "9.8.1"
 }
 
 group = "com.portalsoup"
@@ -47,10 +48,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-
 application {
     mainClass.set(project.property("mainClassName") as String)
 }
@@ -64,7 +61,6 @@ tasks {
         manifest {
             attributes(mapOf("Main-Class" to project.property("mainClassName") as String))
         }
-
     }
     register<Exec>("dockerDown") {
         commandLine("docker-compose", "down")
@@ -73,11 +69,10 @@ tasks {
     register<Exec>("dockerBuild") {
         dependsOn("dockerDown")
         commandLine("docker-compose", "build")
-
     }
 
     register<Exec>("dockerRun") {
-        dependsOn("shadowJar", "dockerDown", "dockerBuild")
+        dependsOn("build", "dockerDown", "dockerBuild")
         commandLine("docker-compose", "up", "-d", "app")
     }
 }
@@ -86,15 +81,19 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
+
+    test {
+        useJUnitPlatform()
+    }
 }
 
 object Versions {
     const val jpx = "1.4.0"
     const val exposed = "0.36.2"
     const val hikari = "2.7.8"
-    const val flyway = "6.5.2"
+    const val flyway = "9.8.2"
     const val ktor = "2.1.3"
-    const val psql = "42.2.14"
+    const val psql = "42.5.0"
     const val h2 = "1.4.200"
     const val kotlinReflect = "1.2.51"
     const val slf4j = "1.7.30"
@@ -142,5 +141,4 @@ object Dependencies {
     val junit = "junit:junit:${Versions.junit}"
     val testng = "org.testng:testng:${Versions.testng}"
     val hamkrest = "com.natpryce:hamkrest:${Versions.hamkrest}"
-
 }
