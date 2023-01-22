@@ -1,46 +1,59 @@
 package com.portalsoup.saas.manager
 
+import com.portalsoup.saas.config.PriceChartingConfig
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.server.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class PriceChartingManager {
 
+    private val priceGuideFile = "price-guide"
+    private val priceGuideSuffix = "csv"
 
     fun requestCsv() {
         val client = HttpClient()
-        val tmpFile = File.createTempFile("price-guide", "csv")
+        val tmpFile = File.createTempFile(priceGuideFile, priceGuideSuffix)
         println("about to request csv")
 
 
         runBlocking {
             println("in thread")
-            client.prepareGet("https://google.com").execute {
-                println("got google response")
-            }
-            client.prepareGet(ENDPOINT).execute { response: HttpResponse ->
+            client.prepareGet(PRICE_GUIDE_CSV).execute { response: HttpResponse ->
                 println("parsing response")
                 val channel = response.bodyAsChannel()
 
+                print("Reading bytes")
                 while (!channel.isClosedForRead) {
                     val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
                     while (!packet.isEmpty) {
                         val bytes = packet.readBytes()
                         tmpFile.appendBytes(bytes)
-                        println("Received ${bytes.size} bytes")
+                        print(".")
                     }
                 }
+                println("done")
             }
         }
 
-        tmpFile.copyTo(File("/home/portalsoup"), false)
+        copyBackup(tmpFile)
     }
 
-    companion object {
-        private const val ENDPOINT = "https://www.pricecharting.com/price-guide/download-custom?t=6f02aae4e844b99b20bb7fff71fe68c2123b5f33"
+    fun copyBackup(file: File) {
+        println("Copying file")
+        val backupCopy = file.copyTo(File("${PriceChartingConfig.priceBackupFilePath}/$priceGuideFile.$priceGuideSuffix"), false)
+        println("Backed up to ${backupCopy.absolutePath}")
     }
+    companion object {
+        private val PRICE_GUIDE_CSV = "https://www.pricecharting.com/price-guide/download-custom?t=${PriceChartingConfig.apiKey}"
+    }
+}
+
+object PriceChartingProductQuery {
+    private val endpoint = "https://www.pricecharting.com/api/product?t=${PriceChartingConfig.apiKey}"
+    fun byId(id: Int): String = "$endpoint&id=$id"
+    fun byQuery(query: String): String = "$endpoint&q=$query"
+    fun byUPC(upc: String): String = "$endpoint&upc=$upc"
 }

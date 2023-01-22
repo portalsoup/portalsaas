@@ -1,0 +1,52 @@
+---
+- hosts: portalsaas
+  become: yes
+
+  handlers:
+    - name: reload_systemd
+      shell: systemctl daemon-reload
+
+
+    - name: restart_portalsaas
+      service:
+        name: portalsaas
+        state: restarted
+
+  tasks:
+    - name: Install apt packages
+      apt:
+        update_cache: true
+        pkg:
+          - default-jre
+
+    - name: Create portalsaas's directory
+      file:
+        path: /srv/portalsaas
+        state: directory
+        mode: '0755'
+
+    - name: Copy bot and unzip
+      copy:
+        src: ../build/libs/shadow-1.0-SNAPSHOT-all.jar
+        dest: /srv/portalsaas/portalsaas.jar
+        mode: '+x'
+      notify:
+        - restart_portalsaas
+
+    - name: Copy init script
+      template:
+        src: ./scripts/init.j2
+        dest: /srv/portalsaas/init.sh
+        mode: '+x'
+      notify:
+        - restart_portalsaas
+
+    - name: Copy systemd service
+      copy:
+        src: scripts/portalsaas.service
+        dest: /etc/systemd/system/portalsaas.service
+        owner: root
+        group: root
+      notify:
+        - reload_systemd
+        - restart_portalsaas

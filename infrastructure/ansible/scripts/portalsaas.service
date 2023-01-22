@@ -1,0 +1,12 @@
+[Unit]
+Description=Launch Portalsaas
+
+[Service]
+Type=simple
+ExecStart=/srv/portalsaas/init.sh
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

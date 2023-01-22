@@ -12,9 +12,17 @@ group = "com.portalsoup"
 version = "1.0-SNAPSHOT"
 val ktorVersion = "2.1.3"
 
-project.setProperty("mainClassName", "com.portalsoup.saas.MainKt")
 // Variables required from gradle.properties
 val mainClassName: String by project
+val priceChartingKey: String by project
+val doToken: String by project
+val deploySshId: String by project
+val ansibleDeployIP: String by project
+
+// Shortcuts
+val ansibleDir = "$rootDir/infrastructure/ansible/"
+val terraformDir = "$rootDir/infrastructure/terraform/"
+val pathToAnsibleInventory = "$ansibleDir/inventory"
 
 repositories {
     mavenCentral()
@@ -141,4 +149,134 @@ object Dependencies {
     val junit = "junit:junit:${Versions.junit}"
     val testng = "org.testng:testng:${Versions.testng}"
     val hamkrest = "com.natpryce:hamkrest:${Versions.hamkrest}"
+}
+
+// Infrastructure
+tasks {
+    create("deploy") {
+        dependsOn("shadowJar", "terraform-apply", "ansible")
+        group = "deploy"
+    }
+
+    create("terraform-init") {
+        group = "deploy"
+
+        onlyIf {
+            println("Checking for the presence of infrastructure/terraform/data.tf")
+            File("$terraformDir/data.tf").exists()
+        }
+
+        doLast {
+            project.exec {
+                workingDir("$terraformDir")
+                commandLine("terraform", "init",
+                    "-var", "do_token=$doToken"
+                )
+            }
+        }
+    }
+
+    /*
+     * By depending on this task, you require a user to manually validate the calculated diff.  If rejected this task
+     * prevents downstream tasks from performing any changes
+     */
+    create("terraform-plan") {
+        group = "deploy"
+
+        onlyIf {
+            println("Checking for the presence of infrastructure/terraform/data.tf")
+            File("$terraformDir/data.tf").exists()
+        }
+
+        // configure stdin for prompts
+        val run by getting(JavaExec::class) {
+            standardInput = System.`in`
+        }
+
+        doLast {
+            val planResult = project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "plan",
+                    "-var", "ssh_id=${deploySshId}",
+                    "-var", "do_token=$doToken"
+                )
+            }
+            when (planResult.exitValue) {
+                0 -> {
+                    println("Accept this plan? (Type 'yes' to accept)")
+                    readLine()
+                        ?.takeIf { it == "yes" }
+                        ?: throw GradleException("Terraform planned changes were rejected")
+                }
+                else -> throw GradleException("Unexpected failure $planResult")
+            }
+        }
+    }
+
+    create("terraform-apply") {
+        group = "deploy"
+
+        dependsOn("terraform-plan")
+
+        onlyIf {
+            println("Checking for the presence of infrastructure/terraform/data.tf")
+            File("$terraformDir/data.tf").exists()
+        }
+
+        doLast {
+            project.exec {
+                workingDir("$terraformDir")
+                commandLine("terraform", "apply",
+                    "-auto-approve",
+                    "-var", "ssh_id=${deploySshId}",
+                    "-var", "do_token=$doToken"
+                )
+            }
+        }
+    }
+
+    create("ansible") {
+        group = "deploy"
+
+        mustRunAfter("terraform-plan", "terraform-apply", "shadowJar")
+
+        // Only depend on create-inventory if an inventory file needs to be generated from gradle.properties
+        File("$ansibleDir/inventory")
+            .takeIf { it.exists() }
+            ?: dependsOn("create-inventory")
+
+        doLast {
+            val sshUser = project.properties["sshUser"]
+                ?.let { it as String }
+                ?.takeIf { it.isNotEmpty() }
+                ?: "root"
+
+            project.exec {
+                workingDir(ansibleDir)
+                commandLine("ansible-playbook",
+                    "-u", sshUser,
+                    "--extra-vars", "{\"priceChartingKey\": $priceChartingKey, \"\"}",
+                    "-i", pathToAnsibleInventory,
+                    "--flush-cache",
+                    "portalsaas.yml"
+                )
+            }
+        }
+    }
+
+    create("create-inventory") {
+        group = "deploy"
+
+        onlyIf {
+            println("Checking for the presence of infrastructure/terraform/data.tf")
+            !File(pathToAnsibleInventory).exists()
+        }
+
+        doLast {
+            File(pathToAnsibleInventory).writeText("""
+            [portalsaas]
+            $ansibleDeployIP
+        """.trimIndent())
+        }
+    }
 }

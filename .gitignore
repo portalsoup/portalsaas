@@ -2,3 +2,7 @@
 .gradle/
 .idea/
 gradle.properties
+pricecharting/
+**/*.tfstate*
+**/.terraform.lock.hcl
+**/.terraform/

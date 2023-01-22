@@ -1,11 +1,12 @@
 package com.portalsoup.saas.schedule
 
+import com.portalsoup.saas.config.PriceChartingConfig
 import com.portalsoup.saas.manager.PriceChartingManager
 import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
 import java.util.concurrent.atomic.AtomicInteger
 
-class PriceChartingUpdater {
+class PriceChartingUpdater() {
     class PriceChartingCsvJob : Job {
 
         companion object {
