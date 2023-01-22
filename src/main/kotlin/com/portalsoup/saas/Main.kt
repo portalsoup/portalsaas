@@ -10,9 +10,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-fun main(args: Array<String>) {
-    EngineMain.main(args)
-}
+fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.coreModule() {
     fun createAppConfig(): AppConfig =

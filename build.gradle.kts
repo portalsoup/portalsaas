@@ -82,7 +82,13 @@ application {
 }
 
 tasks {
+    build {
+        dependsOn("ktor-config")
+    }
+
     named<ShadowJar>("shadowJar") {
+        dependsOn("ktor-config")
+
         archiveBaseName.set("shadow")
         archiveVersion.set("")
         archiveClassifier.set("")
@@ -91,6 +97,7 @@ tasks {
             attributes(mapOf("Main-Class" to project.property("mainClassName") as String))
         }
     }
+
     register<Exec>("dockerDown") {
         commandLine("docker-compose", "down")
     }
@@ -108,7 +115,7 @@ tasks {
 
 tasks {
     build {
-        dependsOn(shadowJar)
+        dependsOn(shadowJar, "ktor-config")
     }
 
     test {
@@ -212,6 +219,10 @@ tasks {
 
         doNotTrackState("We should not cache secrets")
 
+        onlyIf {
+            File("$terraformDir/terraform.tfstate").exists()
+        }
+
         val databaseStream = ByteArrayOutputStream()
         val hostStream = ByteArrayOutputStream()
         val portStream = ByteArrayOutputStream()
@@ -271,6 +282,10 @@ tasks {
 
     create("terraform-droplet-ip") {
         group = "deploy"
+
+        onlyIf {
+            File("$terraformDir/terraform.tfstate").exists()
+        }
 
         doNotTrackState("We should not cache secrets")
 
@@ -354,18 +369,23 @@ tasks.create("ktor-config") {
         val static = File("$pathToResources/application.static.conf")
         val dest = File("$pathToResources/application.conf")
 
-        val host = ext.get("privateHost")
-        val port = ext.get("port")
-        val db = ext.get("database")
-        val username = ext.get("user")
-        val password = ext.get("password")
-
-        println("The found host was: $host")
-
-        // Merge the static and dynamic portions
         static.copyTo(dest, true)
-        dest.appendText("\n\n")
-        dest.appendText("""
+
+        File("$terraformDir/terraform.tfstate")
+            .takeIf { it.exists() }
+            ?.let {
+
+                val host = ext.get("privateHost")
+                val port = ext.get("port")
+                val db = ext.get("database")
+                val username = ext.get("user")
+                val password = ext.get("password")
+
+                println("The found host was: $host")
+
+                // Merge the static and dynamic portions
+                dest.appendText("\n\n")
+                dest.appendText("""
         jdbc {
             url = "jdbc:postgresql://$host:$port/$db?sslmode=require"
             driver = "org.postgresql.Driver"
@@ -374,5 +394,6 @@ tasks.create("ktor-config") {
             maxPool = "10"
         }
         """.trimIndent())
+            }
     }
 }
