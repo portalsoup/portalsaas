@@ -8,3 +8,4 @@ pricecharting/
 **/.terraform/
 **/application.conf
 **/application.yaml
+**/inventory

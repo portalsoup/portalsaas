@@ -27,7 +27,7 @@
 
     - name: Copy bot and unzip
       copy:
-        src: ../build/libs/shadow-1.0-SNAPSHOT-all.jar
+        src: ../../build/libs/shadow.jar
         dest: /srv/portalsaas/portalsaas.jar
         mode: '+x'
       notify:

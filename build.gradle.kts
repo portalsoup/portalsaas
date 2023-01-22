@@ -112,6 +112,12 @@ tasks {
     test {
         useJUnitPlatform()
     }
+
+    clean {
+        doLast {
+            file("$ansibleDir/inventory").delete()
+        }
+    }
 }
 
 // Infrastructure
@@ -218,10 +224,10 @@ tasks {
                 workingDir(ansibleDir)
                 commandLine("ansible-playbook",
                     "-u", sshUser,
-                    "--extra-vars", "{\"priceChartingKey\": $priceChartingKey, \"\"}",
+//                    "--extra-vars", "{\"priceChartingKey\": $priceChartingKey, \"\"}",
                     "-i", pathToAnsibleInventory,
                     "--flush-cache",
-                    "portalsaas.yml"
+                    "portalsaas.yaml"
                 )
             }
         }
