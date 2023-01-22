@@ -6,3 +6,5 @@ pricecharting/
 **/*.tfstate*
 **/.terraform.lock.hcl
 **/.terraform/
+**/application.conf
+**/application.yaml

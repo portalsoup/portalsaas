@@ -1,56 +1,47 @@
 package com.portalsoup.saas
 
-import com.portalsoup.saas.config.JdbcConfig
-import com.portalsoup.saas.core.Retrier
-import com.portalsoup.saas.core.configureRouting
-import com.portalsoup.saas.core.configureSerialization
-import com.portalsoup.saas.schedule.PriceChartingUpdater
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import io.ktor.server.engine.*
+import com.portalsoup.saas.api.healthcheckApi
+import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.config.Jdbc
+import io.ktor.server.application.*
 import io.ktor.server.netty.*
-import org.flywaydb.core.Flyway
+import io.ktor.server.routing.*
+import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 
-fun main() {
-    println("Entered main")
-
-
-    val dbConfig = HikariConfig().apply {
-        jdbcUrl = JdbcConfig.jdbcUrl
-        driverClassName = JdbcConfig.driverClassName
-        username = JdbcConfig.username
-        password = JdbcConfig.password
-        maximumPoolSize = JdbcConfig.maximumPoolSize
-        connectionTestQuery = JdbcConfig.connectionTestQuery
-    }
-
-    println("validating dbconfig")
-    dbConfig.validate()
-
-    println("about to get data source")
-    val dataSource: HikariDataSource = Retrier("initialize-hikari") {
-        println("trying to get data source...")
-        HikariDataSource(dbConfig)
-    }
-    println("got data source")
-
-    println("about to start migration")
-    Retrier("flyway-migration") {
-        println("trying to migrate db...")
-        Flyway.configure().dataSource(dataSource).load().migrate()
-    }
-    println("got past retries")
-
-    println("Starting PriceCharting scheduler")
-    PriceChartingUpdater().startScheduler()
-    println("Pricecharting scheduled")
-
-    initKtor()
+fun main(args: Array<String>) {
+    EngineMain.main(args)
 }
 
-fun initKtor() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
-        configureRouting()
-        configureSerialization()
-    }.start(wait = true)
+fun Application.coreModule() {
+    fun createAppConfig(): AppConfig =
+        AppConfig(
+            Jdbc(
+                url = environment.config.property("jdbc.url").getString(),
+                driver = environment.config.property("jdbc.driver").getString(),
+                username = environment.config.property("jdbc.username").getString(),
+                password = environment.config.property("jdbc.password").getString(),
+                maxPool = environment.config.property("jdbc.maxPool").getString().toInt()
+
+            )
+        )
+
+    val appModule = module {
+        singleOf(::createAppConfig)
+        single { TestInjection("This value was dependency injected!") }
+    }
+
+    startKoin {
+        modules(
+            appModule
+        )
+    }
+
+
+    routing {
+        healthcheckApi()
+    }
 }
+
+data class TestInjection(val str: String)
