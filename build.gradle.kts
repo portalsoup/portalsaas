@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.io.ByteArrayOutputStream
 
 object Versions {
     const val jpx = "1.4.0"
@@ -40,7 +41,8 @@ val ansibleDeployIP: String by project
 // Shortcuts
 val ansibleDir = "$rootDir/infrastructure/ansible/"
 val terraformDir = "$rootDir/infrastructure/terraform/"
-val pathToAnsibleInventory = "$ansibleDir/inventory"
+val pathToAnsibleInventory = "$ansibleDir/inventory/"
+val pathToResources = "$rootDir/src/main/resources/"
 
 repositories {
     mavenCentral()
@@ -116,6 +118,7 @@ tasks {
     clean {
         doLast {
             file("$ansibleDir/inventory").delete()
+            file("$pathToResources/application.conf").delete()
         }
     }
 }
@@ -194,7 +197,7 @@ tasks {
 
         doLast {
             project.exec {
-                workingDir("$terraformDir")
+                workingDir(terraformDir)
                 commandLine("terraform", "apply",
                     "-auto-approve",
                     "-var", "ssh_id=${deploySshId}",
@@ -204,6 +207,87 @@ tasks {
         }
     }
 
+    create("terraform-db-output") {
+        group = "deploy"
+
+        doNotTrackState("We should not cache secrets")
+
+        val databaseStream = ByteArrayOutputStream()
+        val hostStream = ByteArrayOutputStream()
+        val portStream = ByteArrayOutputStream()
+        val privatehostStream = ByteArrayOutputStream()
+        val idStream = ByteArrayOutputStream()
+        val userStream = ByteArrayOutputStream()
+        val passwordStream = ByteArrayOutputStream()
+
+        doFirst {
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-database")
+                standardOutput = databaseStream
+            }
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-host")
+                standardOutput = hostStream
+            }
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-port")
+                standardOutput = portStream
+            }
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-private_host")
+                standardOutput = privatehostStream
+            }.exitValue
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-id")
+                standardOutput = idStream
+            }
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-user")
+                standardOutput = userStream
+            }
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "postgres-password")
+                standardOutput = passwordStream
+            }
+        }
+
+        doLast {
+            ext.set("database", databaseStream.toString().replace("\"", "").trim())
+            ext.set("host", hostStream.toString().replace("\"", "").trim())
+            ext.set("port", portStream.toString().replace("\"", "").trim())
+            ext.set("privateHost", privatehostStream.toString().replace("\"", "").trim())
+            ext.set("id", idStream.toString().replace("\"", "").trim())
+            ext.set("user", userStream.toString().replace("\"", "").trim())
+            ext.set("password", passwordStream.toString().replace("\"", "").trim())
+        }
+    }
+
+    create("terraform-droplet-ip") {
+        group = "deploy"
+
+        doNotTrackState("We should not cache secrets")
+
+        val dropletIpStream = ByteArrayOutputStream()
+
+        doFirst {
+            project.exec {
+                workingDir(terraformDir)
+                commandLine("terraform", "output", "droplet-ip")
+                standardOutput = dropletIpStream
+            }
+        }
+
+        doLast {
+            ext.set("dropletIp", dropletIpStream.toString().replace("\"", "").trim())
+        }
+    }
     create("ansible") {
         group = "deploy"
 
@@ -236,16 +320,59 @@ tasks {
     create("create-inventory") {
         group = "deploy"
 
+        dependsOn("terraform-droplet-ip")
+        mustRunAfter("terraform-apply")
+
         onlyIf {
             println("Checking for the presence of infrastructure/terraform/data.tf")
             !File(pathToAnsibleInventory).exists()
         }
 
         doLast {
+            val dropletIp = ext.get("dropletIp")
+
             File(pathToAnsibleInventory).writeText("""
             [portalsaas]
-            $ansibleDeployIP
+            $dropletIp
         """.trimIndent())
         }
+    }
+}
+
+// ktor config generation
+tasks.create("ktor-config") {
+    group = "build"
+
+    dependsOn("terraform-db-output")
+
+    onlyIf {
+        println("Checking for the presence of resources/application.conf")
+        !File("$pathToResources/application.conf").exists()
+    }
+
+    doLast {
+        val static = File("$pathToResources/application.static.conf")
+        val dest = File("$pathToResources/application.conf")
+
+        val host = ext.get("privateHost")
+        val port = ext.get("port")
+        val db = ext.get("database")
+        val username = ext.get("user")
+        val password = ext.get("password")
+
+        println("The found host was: $host")
+
+        // Merge the static and dynamic portions
+        static.copyTo(dest, true)
+        dest.appendText("\n\n")
+        dest.appendText("""
+        jdbc {
+            url = "jdbc:postgresql://$host:$port/$db?sslmode=require"
+            driver = "org.postgresql.Driver"
+            username = "$username"
+            password = "$password"
+            maxPool = "10"
+        }
+        """.trimIndent())
     }
 }
