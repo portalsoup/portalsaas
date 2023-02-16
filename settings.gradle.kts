@@ -9,4 +9,4 @@ pluginManagement {
 
 rootProject.name = "portalsaas"
 
-include("data", "core")
+include("deploy")

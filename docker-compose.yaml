@@ -16,20 +16,16 @@ services:
       - server
     environment:
       <<: *db-config
-      PRICE_CHART_BACKUP_PATH: "/pricecharting"
-      PRICE_CHART_KEY: "6f02aae4e844b99b20bb7fff71fe68c2123b5f33"
     ports:
-      - "8080:8080"
-    volumes:
-      - "./pricecharting:/pricecharting"
+      - "8080:80"
     depends_on:
       - db
   db:
     image: postgres:alpine
     ports:
       - "5432:5432"
-#    volumes:
-#      - vdata:/var/lib/postgresql
+    volumes:
+      - "vdata:/var/lib/postgresql"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: tour
