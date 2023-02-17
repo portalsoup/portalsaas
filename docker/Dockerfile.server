@@ -2,7 +2,7 @@ FROM openjdk:17-alpine
 
 EXPOSE 8080 8081 5006
 
-COPY ./build/libs/shadow.jar /app/
+VOLUME /app
 
 WORKDIR /app
 

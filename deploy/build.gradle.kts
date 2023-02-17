@@ -1,4 +1,15 @@
+import com.github.jknack.handlebars.Handlebars
 import java.io.ByteArrayOutputStream
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.github.jknack:handlebars:4.3.1")
+    }
+}
 
 plugins {
 
@@ -13,6 +24,7 @@ val priceChartingKey: String by project
 val doToken: String by project
 val deploySshId: String by project
 val ansibleDeployIP: String by project
+val discordToken: String by project
 
 // Shortcuts
 val ansibleDir = "$rootDir/infrastructure/ansible/"
@@ -26,7 +38,7 @@ tasks {
     }
 
     rootProject.tasks.getByName("build") {
-        dependsOn("shadowJar", ":deploy:ktor-config")
+        dependsOn(":deploy:ktor-config")
     }
 
     register<Delete>("clean") {
@@ -37,7 +49,7 @@ tasks {
     }
 
     register("deploy") {
-        dependsOn("shadowJar", "terraform-apply", "ansible")
+        dependsOn("terraform-apply", "ansible")
         group = "deploy"
     }
 
@@ -73,7 +85,7 @@ tasks {
         }
 
         // configure stdin for prompts
-        val run by getting(JavaExec::class) {
+        rootProject.tasks.getByName<JavaExec>("run") {
             standardInput = System.`in`
         }
 
@@ -211,7 +223,8 @@ tasks {
     register("ansible") {
         group = "deploy"
 
-        mustRunAfter("terraform-plan", "terraform-apply", "shadowJar")
+        dependsOn("ktor-config")
+        mustRunAfter("terraform-plan", "terraform-apply")
 
         // Only depend on create-inventory if an inventory file needs to be generated from gradle.properties
         File("$ansibleDir/inventory")
@@ -259,47 +272,96 @@ tasks {
     }
 }
 
-
 // ktor config generation
-tasks.register("ktor-config") {
-    group = "build"
+//tasks.register("ktor-config") {
+//    group = "build"
+//
+//    dependsOn("terraform-db-output")
+//
+//    rootProject.tasks.getByName("build") {
+//        mustRunAfter("ktor-config")
+//    }
+//
+//    doLast {
+//        val static = File("$pathToResources/application.static.conf")
+//        val dest = File("$pathToResources/application.conf")
+//
+//        if (dest.exists() && !dest.delete()) {
+//            logger.warn("Could not clean up old application.conf file!")
+//        }
+//        static.copyTo(dest, true)
+//
+//        File("$terraformDir/terraform.tfstate")
+//            .takeIf { it.exists() }
+//            ?.let {
+//
+//                val host = ext.get("privateHost")
+//                val port = ext.get("port")
+//                val db = ext.get("database")
+//                val username = ext.get("user")
+//                val password = ext.get("password")
+//
+//                println("The found host was: $host")
+//
+//                // Merge the static and dynamic portions
+//                dest.appendText("\n\n")
+//                dest.appendText("""
+//        jdbc {
+//            url = "jdbc:postgresql://$host:$port/$db?sslmode=require"
+//            driver = "org.postgresql.Driver"
+//            username = "$username"
+//            password = "$password"
+//            maxPool = "10"
+//        }
+//
+//        discord {
+//            token = "$discordToken"
+//        }
+//        """.trimIndent())
+//            }
+//    }
+//}
 
+tasks.register("ktor-config") {
     dependsOn("terraform-db-output")
 
-    onlyIf {
-        println("Checking for the presence of resources/application.conf")
-        !File("$pathToResources/application.conf").exists()
-    }
-
     doLast {
-        val static = File("$pathToResources/application.static.conf")
+        val pathToTemplate = "$pathToResources/application.conf.hbs"
         val dest = File("$pathToResources/application.conf")
 
-        static.copyTo(dest, true)
+        val rawTemplate: String = File(pathToTemplate)
+                .takeIf { it.exists() }
+                ?.also { println("Found it") }
+                ?.readText()
+            ?: throw GradleException("application.conf.hbs not found!")
+        val handlebars = Handlebars()
+        val template = handlebars.compileInline(rawTemplate)
 
-        File("$terraformDir/terraform.tfstate")
-            .takeIf { it.exists() }
-            ?.let {
+        val jdbcProps = ApplicationConfTemplate(
+            url = ext.get("privateHost").toString(),
+            driver = "org.postgresql.Driver",
+            username = ext.get("user").toString(),
+            password = ext.get("password").toString(),
+            maxPool = "10",
+            discordToken = discordToken
+        )
 
-                val host = ext.get("privateHost")
-                val port = ext.get("port")
-                val db = ext.get("database")
-                val username = ext.get("user")
-                val password = ext.get("password")
+        val result = template.apply(jdbcProps)
 
-                println("The found host was: $host")
-
-                // Merge the static and dynamic portions
-                dest.appendText("\n\n")
-                dest.appendText("""
-        jdbc {
-            url = "jdbc:postgresql://$host:$port/$db?sslmode=require"
-            driver = "org.postgresql.Driver"
-            username = "$username"
-            password = "$password"
-            maxPool = "10"
+        if (dest.exists() && !dest.delete()) {
+            logger.warn("Could not clean up old application.conf file!")
         }
-        """.trimIndent())
-            }
+
+        dest.createNewFile()
+        dest.writeText(result)
     }
 }
+
+data class ApplicationConfTemplate(
+    val url: String,
+    val driver: String,
+    val username: String,
+    val password: String,
+    val maxPool: String,
+    val discordToken: String
+)

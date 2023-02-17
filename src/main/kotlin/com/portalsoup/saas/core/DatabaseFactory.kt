@@ -16,6 +16,7 @@ class DatabaseFactory: Logging {
             password = appConfig.jdbcConfig.password
             driverClassName = appConfig.jdbcConfig.driver
             maximumPoolSize = appConfig.jdbcConfig.maxPool
+            isAutoCommit = true
             addDataSourceProperty( "cachePrepStmts" , "true" )
             addDataSourceProperty( "prepStmtCacheSize" , "250" )
             addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" )
@@ -46,6 +47,7 @@ class DatabaseFactory: Logging {
         }
     }
     private fun initHikari(dataSource: HikariDataSource) {
+        log().info("Initializing hikari...")
         Database.connect(dataSource)
     }
 }

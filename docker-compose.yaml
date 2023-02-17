@@ -18,6 +18,8 @@ services:
       <<: *db-config
     ports:
       - "8080:80"
+    volumes:
+      - "./build/libs:/app"
     depends_on:
       - db
   db:
@@ -25,7 +27,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "vdata:/var/lib/postgresql"
+      - "./postgres-data:/var/lib"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: tour
@@ -33,7 +35,5 @@ services:
     restart: always
     networks:
       - server
-volumes:
-  vdata: {}
 networks:
   server:

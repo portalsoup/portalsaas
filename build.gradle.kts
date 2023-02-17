@@ -31,6 +31,9 @@ val ktorVersion = "2.1.3"
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://m2.dv8tion.net/releases")
+    }
 }
 
 dependencies {
@@ -63,6 +66,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("org.slf4j:slf4j-api:2.0.5")
 
+    // Discord deps
+    implementation("com.discord4j:discord4j-core:3.2.3")
+    implementation("com.sedmelluq:lavaplayer:1.3.77")
+
     testImplementation(kotlin("test"))
 }
 
@@ -89,6 +96,10 @@ tasks {
     }
 
     build {
+        dependsOn(shadowJar)
+    }
+
+    register("deploy") {
         dependsOn(shadowJar)
     }
 }

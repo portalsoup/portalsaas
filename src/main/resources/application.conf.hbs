@@ -1,0 +1,22 @@
+ktor {
+    deployment {
+        port = 80
+    }
+    application {
+        modules = [
+            com.portalsoup.saas.MainKt.coreModule
+        ]
+    }
+}
+
+jdbc {
+    url = "{{url}}"
+    driver = "{{driver}}"
+    username = "{{username}}"
+    password = "{{password}}"
+    maxPool = "{{maxPool}}"
+}
+
+discord {
+    token = "{{discordToken}}"
+}
