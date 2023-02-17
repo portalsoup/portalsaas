@@ -5,9 +5,8 @@ import com.portalsoup.saas.api.helloWorldApi
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.DatabaseFactory
 import com.portalsoup.saas.discord.DMusic
-import com.portalsoup.saas.discord.command.LavaPlayerAudioProvider
+import com.portalsoup.saas.discord.LavaPlayerAudioProvider
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
 import discord4j.voice.AudioProvider

@@ -1,4 +1,4 @@
-package com.portalsoup.saas.discord.command
+package com.portalsoup.saas.discord
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer

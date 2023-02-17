@@ -3,18 +3,14 @@ package com.portalsoup.saas.discord
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.Logging
 import com.portalsoup.saas.core.log
-import com.portalsoup.saas.discord.command.LavaPlayerAudioProvider
-import com.portalsoup.saas.discord.command.TrackScheduler
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
+import com.portalsoup.saas.discord.command.Command
+import com.portalsoup.saas.discord.command.JoinVoiceCommand
+import com.portalsoup.saas.discord.command.PingPongCommand
+import com.portalsoup.saas.discord.command.PlayYoutubeCommand
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.message.MessageCreateEvent
-import discord4j.core.`object`.VoiceState
-import discord4j.core.`object`.entity.Member
-import discord4j.core.`object`.entity.channel.VoiceChannel
-import discord4j.core.spec.GuildCreateFields.PartialChannel
-import discord4j.discordjson.json.ChannelData
 import discord4j.gateway.intent.Intent
 import discord4j.gateway.intent.IntentSet
 import org.koin.core.component.KoinComponent
@@ -29,7 +25,7 @@ class DMusic: KoinComponent, Logging {
     val audioManager by inject<DefaultAudioPlayerManager>()
     val audioProvider by inject<LavaPlayerAudioProvider>()
 
-    val commands = hashMapOf<String, (event: MessageCreateEvent) -> Mono<Void>>()
+    val commands = hashMapOf<String, Command>()
 
     val client: GatewayDiscordClient = DiscordClient.create(appConfig.discordToken)
         .gateway()
@@ -53,7 +49,7 @@ class DMusic: KoinComponent, Logging {
                     .flatMap { content ->
                         Flux.fromIterable(commands.entries)
                             .filter { content.startsWith(COMMAND_PREFIX + it.key) }
-                            .flatMap { it.value(event) }
+                            .flatMap { it.value.execute(event) }
                             .next()
                     }
             }
@@ -61,40 +57,11 @@ class DMusic: KoinComponent, Logging {
     }
 
     fun initCommands() {
-        commands["ping"] = { event ->
-            println("Receieved command!  [!ping]")
-            event.message
-                .channel
-                .flatMap { it.createMessage("Pong!") }
-                .then()
-        }
-
-        commands["join"] = { event ->
-            println("Receieved command!  [!join]")
-            Mono.justOrEmpty(event.member)
-                .flatMap {
-                    println("Getting voice state")
-                    it.voiceState
-                }
-                .flatMap {
-                    println("Getting channel")
-                    it.channel
-                }
-                .flatMap {
-                    println("Joining with audio provider")
-                    it.join().withProvider(audioProvider)
-                }
-                .then()
-        }
-
         val scheduler = TrackScheduler(audioProvider.player)
-        commands["play"] = { event ->
-            println("Receieved command!  [!play]")
-            Mono.justOrEmpty(event.message.content)
-                .map { it.split(" ") }
-                .doOnNext { audioManager.loadItem(it[1], scheduler) }
-                .then()
-        }
+
+        commands["ping"] = PingPongCommand()
+        commands["join"] = JoinVoiceCommand(audioProvider)
+        commands["play"] = PlayYoutubeCommand(audioManager, scheduler)
     }
 
     companion object {
