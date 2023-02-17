@@ -330,23 +330,27 @@ tasks.register("ktor-config") {
         val dest = File("$pathToResources/application.conf")
 
         val rawTemplate: String = File(pathToTemplate)
-                .takeIf { it.exists() }
-                ?.also { println("Found it") }
-                ?.readText()
+            .takeIf { it.exists() }
+            ?.also { println("Found it") }
+            ?.readText(Charsets.UTF_8)
             ?: throw GradleException("application.conf.hbs not found!")
         val handlebars = Handlebars()
         val template = handlebars.compileInline(rawTemplate)
 
-        val jdbcProps = ApplicationConfTemplate(
-            url = ext.get("privateHost").toString(),
-            driver = "org.postgresql.Driver",
-            username = ext.get("user").toString(),
-            password = ext.get("password").toString(),
-            maxPool = "10",
-            discordToken = discordToken
-        )
+        val host = ext.get("privateHost")
+        val port = ext.get("port")
+        val db = ext.get("database")
 
-        val result = template.apply(jdbcProps)
+        val result = template.apply(mapOf(
+            "host" to host,
+            "port" to port,
+            "db" to db,
+            "driver" to "org.postgresql.Driver",
+            "username" to ext.get("user").toString(),
+            "password" to ext.get("password").toString(),
+            "maxPool" to "10",
+            "discordToken" to discordToken
+        ))
 
         if (dest.exists() && !dest.delete()) {
             logger.warn("Could not clean up old application.conf file!")
@@ -356,12 +360,3 @@ tasks.register("ktor-config") {
         dest.writeText(result)
     }
 }
-
-data class ApplicationConfTemplate(
-    val url: String,
-    val driver: String,
-    val username: String,
-    val password: String,
-    val maxPool: String,
-    val discordToken: String
-)

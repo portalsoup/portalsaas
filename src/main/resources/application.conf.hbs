@@ -10,7 +10,7 @@ ktor {
 }
 
 jdbc {
-    url = "{{url}}"
+    url = "jdbc:postgresql://{{host}}:{{port}}/{{db}}?sslmode=require"
     driver = "{{driver}}"
     username = "{{username}}"
     password = "{{password}}"
