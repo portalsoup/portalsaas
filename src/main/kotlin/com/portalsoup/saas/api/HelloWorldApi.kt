@@ -30,7 +30,6 @@ fun Routing.helloWorldApi() {
                 it[name] = helloer
                 it[createdOn] = LocalDate.now()
             }
-
         }
 
         val formattedHelloers = previousHelloers
