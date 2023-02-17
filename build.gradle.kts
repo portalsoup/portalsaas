@@ -65,6 +65,10 @@ dependencies {
     implementation("io.jenetics:jpx:${Versions.jpx}")
     implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("org.slf4j:slf4j-api:2.0.5")
+    implementation("org.json:json:20220924")
+
+    // math processing
+    implementation("com.notkamui.libs:keval:0.9.0")
 
     // Discord deps
     implementation("com.discord4j:discord4j-core:3.2.3")

@@ -4,8 +4,6 @@ import com.portalsoup.saas.core.log
 import com.portalsoup.saas.data.tables.FriendCodeTable
 import com.portalsoup.saas.discord.command.Command
 import discord4j.core.event.domain.message.MessageCreateEvent
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.entity.User
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,7 +16,7 @@ object AddFriendCodeCommand: Command, KoinComponent {
     private val friendCodeRegex = Regex("(SW-\\d{4}-\\d{4}-\\d{4})")
 
     override fun execute(event: MessageCreateEvent): Mono<Void> {
-        event.message.channel.flatMap { it.createMessage("Acknowledged....") }.then()
+
         val message = event.message
         val content = message.content ?: return fail("Failed to find the message content")
         val user = event.message.author.orElse(null) ?: return fail("Failed to find the message author")
@@ -30,12 +28,9 @@ object AddFriendCodeCommand: Command, KoinComponent {
         }
 
         if (userMaybeExists != null) {
-            message.channel
+            return message.channel
                 .flatMap { it.createMessage("I already have your code") }
                 .then()
-            return Mono.empty()
-        } else {
-            log().info("Adding new user")
         }
 
         transaction {
@@ -46,7 +41,9 @@ object AddFriendCodeCommand: Command, KoinComponent {
             }
         }
 
-        return Mono.empty()
+        return message.channel
+            .flatMap { it.createMessage("I added your friend code!") }
+            .then()
     }
 
     private fun parseCode(message: String): String? = friendCodeRegex

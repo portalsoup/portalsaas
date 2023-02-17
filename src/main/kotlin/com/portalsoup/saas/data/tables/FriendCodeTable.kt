@@ -22,7 +22,7 @@ data class FriendCode(
             id = resultRow[FriendCodeTable.id].value,
             user = resultRow[FriendCodeTable.user],
             code = resultRow[FriendCodeTable.code],
-            createdOn = resultRow[HelloWorldTable.createdOn]
+            createdOn = resultRow[FriendCodeTable.createdOn]
         )
     }
 }

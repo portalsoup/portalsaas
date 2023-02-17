@@ -4,10 +4,13 @@ import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.Logging
 import com.portalsoup.saas.core.log
 import com.portalsoup.saas.discord.command.Command
+import com.portalsoup.saas.discord.command.MathCommand
 import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
 import com.portalsoup.saas.discord.command.PingPongCommand
+import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.AddFriendCodeCommand
 import com.portalsoup.saas.discord.command.friendcode.LookupFriendCodeCommand
+import com.portalsoup.saas.discord.command.friendcode.RemoveFriendCodeCommand
 import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
 import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
@@ -47,7 +50,7 @@ class DiscordBot: KoinComponent, Logging {
                     .flatMap { content ->
                         Flux.fromIterable(commands.entries)
                             .filter { content.startsWith(COMMAND_PREFIX + it.key) }
-                            .flatMap { it.value.execute(event) }
+                            .flatMap { runCatching { it.value.execute(event) }.getOrElse { Mono.empty() } }
                             .next()
                     }
             }
@@ -57,9 +60,13 @@ class DiscordBot: KoinComponent, Logging {
     fun initCommands() {
 
         commands["ping"] = PingPongCommand
+        commands["math"] = MathCommand
         commands["join"] = JoinVoiceCommand
         commands["play"] = PlayYoutubeCommand
-        commands["add friendcode"] = AddFriendCodeCommand
+        commands["friendcode"] = LookupFriendCodeCommand
+        commands["friendcode add"] = AddFriendCodeCommand
+        commands["friendcode remove"] = RemoveFriendCodeCommand
+        commands["mtg"] = MtgCommand
     }
 
     companion object {

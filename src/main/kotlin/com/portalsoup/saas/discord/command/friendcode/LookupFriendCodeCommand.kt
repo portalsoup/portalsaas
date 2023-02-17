@@ -9,29 +9,20 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
 import reactor.core.publisher.Mono
-import kotlin.jvm.optionals.getOrNull
 
 object LookupFriendCodeCommand: KoinComponent, Command {
     override fun execute(event: MessageCreateEvent): Mono<Void> {
         val message = event.message
-        val content = message.content ?: return fail("Failed to find the message content")
         val user: User = event.message.userMentions.firstOrNull()
             ?: event.message.author.orElse(null)
             ?: return fail("Failed to find any referencable user to lookup")
 
-        val foundUser = transaction {
-            Mono.just(user)
-                .map { FriendCodeTable.select { FriendCodeTable.user eq it.id.asString() } }
-                .map { it.single() }
-                .map { FriendCode.fromRow(it) }
-                .map { "${user.username}: ${it.code}" }
-        }
-
-        foundUser.subscribe { msg ->
-            message.channel.flatMap { it.createMessage(msg) }
-        }
-
-        return foundUser.then()
+        return Mono.just(user)
+            .mapNotNull { transaction { FriendCodeTable.select { FriendCodeTable.user eq it.id.asString() }.singleOrNull() } }
+            .map { FriendCode.fromRow(it!!) } // This actually won't be null because of mapNotNull's terminating case
+            .map { it.code }
+            .flatMap { msg -> message.channel.flatMap { it.createMessage(msg) } }
+            .then()
     }
 
 }
