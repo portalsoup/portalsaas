@@ -4,12 +4,12 @@ import com.portalsoup.saas.api.healthcheckApi
 import com.portalsoup.saas.api.helloWorldApi
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.DatabaseFactory
-import com.portalsoup.saas.discord.DMusic
+import com.portalsoup.saas.discord.DiscordBot
 import com.portalsoup.saas.discord.LavaPlayerAudioProvider
+import com.portalsoup.saas.discord.TrackScheduler
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
-import discord4j.voice.AudioProvider
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
@@ -37,7 +37,6 @@ fun Application.coreModule() {
     AudioSourceManagers.registerRemoteSources(playerManager)
 
     val player = playerManager.createPlayer()
-    val provider: AudioProvider = LavaPlayerAudioProvider(player)
 
     // Koin dependency management
     val appModule = module {
@@ -45,6 +44,7 @@ fun Application.coreModule() {
         single { TestInjection("This value was dependency injected!") }
         single { playerManager }
         single { LavaPlayerAudioProvider(player) }
+        single { TrackScheduler(player) }
     }
 
     startKoin {
@@ -59,7 +59,7 @@ fun Application.coreModule() {
         helloWorldApi()
     }
     log.info("Initializing discord bot...")
-    DMusic().init()
+    DiscordBot().init()
 
     log.info("Discord bot ready to go")
 }

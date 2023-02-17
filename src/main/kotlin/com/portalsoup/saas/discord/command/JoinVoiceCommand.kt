@@ -2,11 +2,15 @@ package com.portalsoup.saas.discord.command
 
 import com.portalsoup.saas.discord.LavaPlayerAudioProvider
 import discord4j.core.event.domain.message.MessageCreateEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import reactor.core.publisher.Mono
 
-class JoinVoiceCommand(val audioProvider: LavaPlayerAudioProvider): Command {
+object JoinVoiceCommand: Command, KoinComponent {
+
+    private val audioProvider by inject<LavaPlayerAudioProvider>()
     override fun execute(event: MessageCreateEvent): Mono<Void> {
-        println("Receieved command!  [!join]")
+        println("Received command!  [!join]")
         return Mono.justOrEmpty(event.member)
             .flatMap {
                 println("Getting voice state")

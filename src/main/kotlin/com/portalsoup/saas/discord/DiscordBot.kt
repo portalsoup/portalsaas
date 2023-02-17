@@ -18,12 +18,9 @@ import org.koin.core.component.inject
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
+class DiscordBot: KoinComponent, Logging {
 
-class DMusic: KoinComponent, Logging {
-
-    val appConfig by inject<AppConfig>()
-    val audioManager by inject<DefaultAudioPlayerManager>()
-    val audioProvider by inject<LavaPlayerAudioProvider>()
+    private val appConfig by inject<AppConfig>()
 
     val commands = hashMapOf<String, Command>()
 
@@ -57,11 +54,10 @@ class DMusic: KoinComponent, Logging {
     }
 
     fun initCommands() {
-        val scheduler = TrackScheduler(audioProvider.player)
 
-        commands["ping"] = PingPongCommand()
-        commands["join"] = JoinVoiceCommand(audioProvider)
-        commands["play"] = PlayYoutubeCommand(audioManager, scheduler)
+        commands["ping"] = PingPongCommand
+        commands["join"] = JoinVoiceCommand
+        commands["play"] = PlayYoutubeCommand
     }
 
     companion object {
