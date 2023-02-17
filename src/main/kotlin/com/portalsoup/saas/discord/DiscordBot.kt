@@ -4,10 +4,11 @@ import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.Logging
 import com.portalsoup.saas.core.log
 import com.portalsoup.saas.discord.command.Command
-import com.portalsoup.saas.discord.command.JoinVoiceCommand
+import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
 import com.portalsoup.saas.discord.command.PingPongCommand
-import com.portalsoup.saas.discord.command.PlayYoutubeCommand
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
+import com.portalsoup.saas.discord.command.friendcode.AddFriendCodeCommand
+import com.portalsoup.saas.discord.command.friendcode.LookupFriendCodeCommand
+import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
 import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.message.MessageCreateEvent
@@ -58,6 +59,7 @@ class DiscordBot: KoinComponent, Logging {
         commands["ping"] = PingPongCommand
         commands["join"] = JoinVoiceCommand
         commands["play"] = PlayYoutubeCommand
+        commands["add friendcode"] = AddFriendCodeCommand
     }
 
     companion object {

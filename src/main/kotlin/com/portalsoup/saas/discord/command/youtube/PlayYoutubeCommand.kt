@@ -1,6 +1,7 @@
-package com.portalsoup.saas.discord.command
+package com.portalsoup.saas.discord.command.youtube
 
 import com.portalsoup.saas.discord.TrackScheduler
+import com.portalsoup.saas.discord.command.Command
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import discord4j.core.event.domain.message.MessageCreateEvent
 import org.koin.core.component.KoinComponent
