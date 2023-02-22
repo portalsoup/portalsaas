@@ -15,7 +15,7 @@ object AddFriendCodeCommand: Command, KoinComponent {
 
     private val friendCodeRegex = Regex("(SW-\\d{4}-\\d{4}-\\d{4})")
 
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
 
         val message = event.message
         val content = message.content ?: return fail("Failed to find the message content")

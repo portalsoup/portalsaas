@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono
 object JoinVoiceCommand: Command, KoinComponent {
 
     private val audioProvider by inject<LavaPlayerAudioProvider>()
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         println("Received command!  [!join]")
         return Mono.justOrEmpty(event.member)
             .flatMap {

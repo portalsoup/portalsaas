@@ -5,7 +5,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent
 import reactor.core.publisher.Mono
 
 object MathCommand: Command {
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val expression: String = event.message.content.split("!math").lastOrNull()?.trim() ?: return Mono.empty()
 
         val result = kotlin.runCatching {

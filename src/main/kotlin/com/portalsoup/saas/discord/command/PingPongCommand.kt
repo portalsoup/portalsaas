@@ -4,7 +4,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent
 import reactor.core.publisher.Mono
 
 object PingPongCommand: Command {
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         println("Received command!  [!ping]")
         return event.message
             .channel

@@ -1,4 +1,4 @@
-package com.portalsoup.saas.api.card
+package com.portalsoup.saas.manager.card
 
 import com.portalsoup.saas.core.Api
 import discord4j.core.spec.EmbedCreateSpec
@@ -8,7 +8,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONObject
 
-class MagicApi: CardApi() {
+class MagicManager: CardManager() {
 
     val url = "https://api.scryfall.com/cards/named?fuzzy="
     val errorText = "Oops, something went wrong"

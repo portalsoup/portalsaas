@@ -11,7 +11,7 @@ import org.koin.core.component.KoinComponent
 import reactor.core.publisher.Mono
 
 object LookupFriendCodeCommand: KoinComponent, Command {
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val message = event.message
         val user: User = event.message.userMentions.firstOrNull()
             ?: event.message.author.orElse(null)

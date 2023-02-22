@@ -13,7 +13,7 @@ object PlayYoutubeCommand: Command, KoinComponent {
     private val audioManager by inject<DefaultAudioPlayerManager>()
     private val scheduler by inject<TrackScheduler>()
 
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         println("Received command!  [!play]")
         return Mono.justOrEmpty(event.message.content)
             .map { it.split(" ") }

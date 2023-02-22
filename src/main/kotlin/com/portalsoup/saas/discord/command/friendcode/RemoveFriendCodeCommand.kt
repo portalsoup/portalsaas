@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import reactor.core.publisher.Mono
 
 object RemoveFriendCodeCommand: Command {
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val user = event.message.author.orElse(null) ?: return Mono.empty()
 
         transaction {

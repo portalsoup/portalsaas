@@ -1,6 +1,7 @@
 package com.portalsoup.saas.api
 
 import com.portalsoup.saas.TestInjection
+import com.portalsoup.saas.core.db.execAndMap
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -32,12 +33,4 @@ fun Routing.healthcheckApi() {
         call.respond(result.first())
     }
 }
-fun <T> String.execAndMap(transform : (ResultSet) -> T) : List<T> {
-    val result = arrayListOf<T>()
-    TransactionManager.current().exec(this) { rs ->
-        while (rs.next()) {
-            result += transform(rs)
-        }
-    }
-    return result
-}
+
