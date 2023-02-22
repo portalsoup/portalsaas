@@ -11,6 +11,7 @@ import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.AddFriendCodeCommand
 import com.portalsoup.saas.discord.command.friendcode.LookupFriendCodeCommand
 import com.portalsoup.saas.discord.command.friendcode.RemoveFriendCodeCommand
+import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
 import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
 import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
@@ -49,8 +50,10 @@ class DiscordBot: KoinComponent, Logging {
                 Mono.just(event.message.content)
                     .flatMap { content ->
                         Flux.fromIterable(commands.entries)
-                            .filter { content.startsWith(COMMAND_PREFIX + it.key) }
-                            .flatMap { runCatching { it.value.execute(event) }.getOrElse { Mono.empty() } }
+                            .filter { content.startsWith(it.key.commandPrefix()) }
+                            .flatMap { runCatching {
+                                it.value.execute(event, event.message.content.removePrefix(it.key.commandPrefix()))
+                            }.getOrElse { Mono.empty() } }
                             .next()
                     }
             }
@@ -67,10 +70,13 @@ class DiscordBot: KoinComponent, Logging {
         commands["friendcode add"] = AddFriendCodeCommand
         commands["friendcode remove"] = RemoveFriendCodeCommand
         commands["mtg"] = MtgCommand
+//        commands["pokedex"] = PokedexCommand
+        commands["vg"] = VideoGameLookupCommand
     }
 
     companion object {
         const val COMMAND_PREFIX: String = "!"
     }
 
+    fun String.commandPrefix() = COMMAND_PREFIX + this
 }

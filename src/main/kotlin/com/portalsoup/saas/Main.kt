@@ -3,10 +3,11 @@ package com.portalsoup.saas
 import com.portalsoup.saas.api.healthcheckApi
 import com.portalsoup.saas.api.helloWorldApi
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.core.DatabaseFactory
+import com.portalsoup.saas.core.db.DatabaseFactory
 import com.portalsoup.saas.discord.DiscordBot
 import com.portalsoup.saas.discord.LavaPlayerAudioProvider
 import com.portalsoup.saas.discord.TrackScheduler
+import com.portalsoup.saas.manager.PriceChartingManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
@@ -52,6 +53,8 @@ fun Application.coreModule() {
             appModule
         )
     }
+
+    PriceChartingManager().updateLoosePriceGuide()
 
     log.info("Initializing routing...")
     routing {

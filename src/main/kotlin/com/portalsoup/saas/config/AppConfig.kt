@@ -5,7 +5,8 @@ import org.koin.core.component.KoinComponent
 
 data class AppConfig(
     val jdbcConfig: Jdbc,
-    val discordToken: String
+    val discordToken: String,
+    val pricechartingToken: String
 ) : KoinComponent {
     companion object {
         fun default(environment: ApplicationEnvironment): AppConfig {
@@ -15,6 +16,7 @@ data class AppConfig(
             val jdbcPassword = System.getenv("JDBC_PASSWORD") ?: environment.config.property("jdbc.password").getString()
             val jdbcMaxPool = System.getenv("JDBC_MAX_POOL")?.toInt() ?: environment.config.property("jdbc.maxPool").getString().toInt()
             val discordToken = System.getenv("DISCORD_TOKEN") ?: environment.config.property("discord.token").getString()
+            val pricechartingToken = System.getenv("PRICECHARTING_TOKEN") ?: environment.config.property("pricecharting.token").getString()
 
             return AppConfig(
                 Jdbc(
@@ -24,7 +26,8 @@ data class AppConfig(
                     password = jdbcPassword,
                     maxPool = jdbcMaxPool
                 ),
-                discordToken = discordToken
+                discordToken = discordToken,
+                pricechartingToken = pricechartingToken
             )
         }
     }

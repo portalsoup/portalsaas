@@ -25,6 +25,7 @@ val doToken: String by project
 val deploySshId: String by project
 val ansibleDeployIP: String by project
 val discordToken: String by project
+val pricechartingToken: String by project
 
 // Shortcuts
 val ansibleDir = "$rootDir/infrastructure/ansible/"
@@ -272,56 +273,6 @@ tasks {
     }
 }
 
-// ktor config generation
-//tasks.register("ktor-config") {
-//    group = "build"
-//
-//    dependsOn("terraform-db-output")
-//
-//    rootProject.tasks.getByName("build") {
-//        mustRunAfter("ktor-config")
-//    }
-//
-//    doLast {
-//        val static = File("$pathToResources/application.static.conf")
-//        val dest = File("$pathToResources/application.conf")
-//
-//        if (dest.exists() && !dest.delete()) {
-//            logger.warn("Could not clean up old application.conf file!")
-//        }
-//        static.copyTo(dest, true)
-//
-//        File("$terraformDir/terraform.tfstate")
-//            .takeIf { it.exists() }
-//            ?.let {
-//
-//                val host = ext.get("privateHost")
-//                val port = ext.get("port")
-//                val db = ext.get("database")
-//                val username = ext.get("user")
-//                val password = ext.get("password")
-//
-//                println("The found host was: $host")
-//
-//                // Merge the static and dynamic portions
-//                dest.appendText("\n\n")
-//                dest.appendText("""
-//        jdbc {
-//            url = "jdbc:postgresql://$host:$port/$db?sslmode=require"
-//            driver = "org.postgresql.Driver"
-//            username = "$username"
-//            password = "$password"
-//            maxPool = "10"
-//        }
-//
-//        discord {
-//            token = "$discordToken"
-//        }
-//        """.trimIndent())
-//            }
-//    }
-//}
-
 tasks.register("ktor-config") {
     dependsOn("terraform-db-output")
 
@@ -331,7 +282,6 @@ tasks.register("ktor-config") {
 
         val rawTemplate: String = File(pathToTemplate)
             .takeIf { it.exists() }
-            ?.also { println("Found it") }
             ?.readText(Charsets.UTF_8)
             ?: throw GradleException("application.conf.hbs not found!")
         val handlebars = Handlebars()
@@ -349,7 +299,8 @@ tasks.register("ktor-config") {
             "username" to ext.get("user").toString(),
             "password" to ext.get("password").toString(),
             "maxPool" to "10",
-            "discordToken" to discordToken
+            "discordToken" to discordToken,
+            "pricechartingToken" to pricechartingToken
         ))
 
         if (dest.exists() && !dest.delete()) {
