@@ -9,7 +9,6 @@ import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

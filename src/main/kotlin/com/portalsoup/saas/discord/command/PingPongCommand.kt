@@ -5,7 +5,6 @@ import reactor.core.publisher.Mono
 
 object PingPongCommand: Command {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
-        println("Received command!  [!ping]")
         return event.message
             .channel
             .flatMap { it.createMessage("Pong!") }

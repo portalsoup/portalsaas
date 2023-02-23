@@ -20,7 +20,6 @@ object DiceRollCommand: Command {
                 .also {
                     for (i in 1..die) {
                         val roll = (Random.nextInt(faces) + 1).toString()
-                        println("Adding a roll! $roll")
                         it.addField("", roll, true)
                     }
                 }

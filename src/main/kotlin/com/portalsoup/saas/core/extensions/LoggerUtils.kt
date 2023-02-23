@@ -1,4 +1,4 @@
-package com.portalsoup.saas.core
+package com.portalsoup.saas.core.extensions
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

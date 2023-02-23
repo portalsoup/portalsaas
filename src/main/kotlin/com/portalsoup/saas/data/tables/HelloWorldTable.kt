@@ -3,8 +3,6 @@ package com.portalsoup.saas.data.tables
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.javatime.date
-import org.jetbrains.exposed.sql.javatime.timestamp
-import java.time.Instant
 import java.time.LocalDate
 
 object HelloWorldTable : IntIdTable("hello_world") {

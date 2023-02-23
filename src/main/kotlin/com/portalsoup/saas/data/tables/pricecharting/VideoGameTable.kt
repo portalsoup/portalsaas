@@ -32,25 +32,14 @@ data class VideoGame(
             updatedOn = resultRow[VideoGameTable.updatedOn]
         )
 
-        fun fromSet(resultSet: ResultSet): VideoGame {
-            printColumnDetails(resultSet)
-            return VideoGame(
-                id = resultSet.getInt("id"),
-                pricechartingId = resultSet.getInt("pricecharting_id"),
-                consoleName = resultSet.getString("console_name"),
-                productName = resultSet.getString("product_name"),
-                createdOn = resultSet.getDate("created_on").toLocalDate(),
-                updatedOn = resultSet.getDate("updated_on").toLocalDate()
-            )
-        }
-
-        fun printColumnDetails(resultSet: ResultSet) {
-            println("About to count columns")
-            for (i in 1..resultSet.metaData.columnCount) {
-                val columnName = resultSet.metaData.getColumnName(i)
-                println("Found the column: [${columnName}]=${resultSet.getString(columnName)}")
-            }
-        }
-
+        @Suppress("unused")
+        fun fromSet(resultSet: ResultSet): VideoGame = VideoGame(
+            id = resultSet.getInt("id"),
+            pricechartingId = resultSet.getInt("pricecharting_id"),
+            consoleName = resultSet.getString("console_name"),
+            productName = resultSet.getString("product_name"),
+            createdOn = resultSet.getDate("created_on").toLocalDate(),
+            updatedOn = resultSet.getDate("updated_on").toLocalDate()
+        )
     }
 }

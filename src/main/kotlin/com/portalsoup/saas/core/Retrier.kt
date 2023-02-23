@@ -1,5 +1,7 @@
 package com.portalsoup.saas.core
 
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import java.lang.Exception
 import java.lang.RuntimeException
 
@@ -10,23 +12,22 @@ data class RetryConfig(
     val verbose: Boolean = false
 )
 
-object Retrier {
-    private val log = getLogger(Retrier.javaClass)
+object Retrier: Logging {
     operator fun <T> invoke(
         name: String,
         config: RetryConfig = RetryConfig(),
         lambda: () -> T
     ): T {
         for (x in 1..config.maxTries) {
-            log.info("Attempting to run $name...")
+            log().info("Attempting to run $name...")
             try {
                 val success = lambda()
-                log.info("Success!")
+                log().info("Success!")
                 return success
             } catch (e: Exception) {
                 val shortMsg = "Failed because: : [${e.message}] with ${config.maxTries - x} tries remaining.  Waiting for ${config.nextBackoffInterval(x)} seconds"
                 val longMsg = "$shortMsg\n${e.stackTraceToString()}"
-                println(config.verbose.takeIf { true }?.let { longMsg } ?: shortMsg)
+                log().info(config.verbose.takeIf { true }?.let { longMsg } ?: shortMsg)
                 Thread.sleep((config.firstInterval * 1000L) + config.nextBackoffInterval(x)) // interval + 5 seconds per try
             }
         }

@@ -1,9 +1,9 @@
 package com.portalsoup.saas.core.db
 
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.core.Logging
+import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.Retrier
-import com.portalsoup.saas.core.log
+import com.portalsoup.saas.core.extensions.log
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway

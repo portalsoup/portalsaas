@@ -1,7 +1,8 @@
 package com.portalsoup.saas.discord.command.pricecharting
 
-import com.portalsoup.saas.core.Logging
+import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.db.execAndMap
+import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.discord.command.Command
 import discord4j.core.event.domain.message.MessageCreateEvent
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -31,21 +32,17 @@ object VideoGameLookupCommand: Command, Logging {
                 |  video_game as vg
                 |  LEFT OUTER JOIN video_game_price ON video_game_price.video_game_id = vg.pricecharting_id
                 |ORDER by dist, price_date LIMIT $resultLimit;
-            """.trimMargin().execAndMap {
-                    println("Processing a result")
-                    val result = Result(
-                        name = it.getString("product_name"),
-                        console = it.getString("console_name"),
-                        price = it.getString("loose_price"),
-                        pricechartingId = it.getString("pricecharting_id"),
-                        priceDate = it.getDate("price_date").toLocalDate()
-                    )
-                    println(result)
-                    result
+            """.trimMargin().execAndMap { Result(
+                    name = it.getString("product_name"),
+                    console = it.getString("console_name"),
+                    price = it.getString("loose_price"),
+                    pricechartingId = it.getString("pricecharting_id"),
+                    priceDate = it.getDate("price_date").toLocalDate()
+                )
                 }
             }
         }
-            .onFailure { println("An exception was thrown! ${it.message}") }
+            .onFailure { log().info("An exception was thrown! ${it.message}") }
             .getOrElse { emptyList() }
             .sortedBy { it.priceDate }
             .distinctBy { it.pricechartingId }

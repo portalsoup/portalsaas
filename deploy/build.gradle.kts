@@ -57,7 +57,7 @@ tasks {
         group = "deploy"
 
         onlyIf {
-            println("Checking for the presence of infrastructure/terraform/data.tf")
+            logger.info("Checking for the presence of infrastructure/terraform/data.tf")
             File("$terraformDir/data.tf").exists()
         }
 
@@ -80,7 +80,7 @@ tasks {
         group = "deploy"
 
         onlyIf {
-            println("Checking for the presence of infrastructure/terraform/data.tf")
+            logger.info("Checking for the presence of infrastructure/terraform/data.tf")
             File("$terraformDir/data.tf").exists()
         }
 
@@ -99,7 +99,7 @@ tasks {
             }
             when (planResult.exitValue) {
                 0 -> {
-                    println("Accept this plan? (Type 'yes' to accept)")
+                    logger.info("Accept this plan? (Type 'yes' to accept)")
                     readLine()
                         ?.takeIf { it == "yes" }
                         ?: throw GradleException("Terraform planned changes were rejected")
@@ -115,7 +115,7 @@ tasks {
         dependsOn("terraform-plan")
 
         onlyIf {
-            println("Checking for the presence of infrastructure/terraform/data.tf")
+            logger.info("Checking for the presence of infrastructure/terraform/data.tf")
             File("$terraformDir/data.tf").exists()
         }
 
@@ -259,7 +259,7 @@ tasks {
         mustRunAfter("terraform-apply")
 
         onlyIf {
-            println("Checking for the presence of infrastructure/terraform/data.tf")
+            logger.info("Checking for the presence of infrastructure/terraform/data.tf")
             !File(pathToAnsibleInventory).exists()
         }
 

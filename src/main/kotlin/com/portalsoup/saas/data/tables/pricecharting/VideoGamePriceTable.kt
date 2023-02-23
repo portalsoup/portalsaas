@@ -13,6 +13,7 @@ object VideoGamePriceTable : IntIdTable("video_game_price") {
     val createdOn = date("created_on")
 }
 
+@Suppress("unused")
 data class VideoGamePrice(
     val id: Int?,
     val videoGameId: Int,
@@ -20,6 +21,8 @@ data class VideoGamePrice(
     val createdOn: LocalDate
 ) {
     companion object {
+
+        @Suppress("unused")
         fun fromRow(resultRow: ResultRow) = VideoGamePrice(
             id = resultRow[VideoGamePriceTable.id].value,
             videoGameId = resultRow[VideoGamePriceTable.videoGameId],
@@ -27,6 +30,7 @@ data class VideoGamePrice(
             createdOn = resultRow[VideoGamePriceTable.createdOn]
         )
 
+        @Suppress("unused")
         fun fromSet(resultSet: ResultSet): VideoGamePrice = VideoGamePrice(
             id = runCatching { resultSet.getInt("_id") }.getOrNull(),
             videoGameId = resultSet.getInt("video_game_id"),

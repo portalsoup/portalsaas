@@ -1,8 +1,8 @@
 package com.portalsoup.saas.manager
 
 import com.portalsoup.saas.core.Api
-import com.portalsoup.saas.core.Logging
-import com.portalsoup.saas.core.log
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.dto.Ability
 import com.portalsoup.saas.dto.Pokemon
 import com.portalsoup.saas.dto.PokemonHandle
@@ -35,7 +35,7 @@ object PokemonManager: Logging {
         val stats = "**HP**: $hp **Atk**: $atk **Sp Atk**: $spAtk" +
                 "\n**Spd**: $spd **Def**: $def  **Sp Def**: $spDef"
 
-        val types = pokemon.types.map { type -> type.name.name }.joinToString(", ")
+        val types = pokemon.types.joinToString(", ") { type -> type.name.name }
 
         val frontSprite = shiny
             .takeIf { it }
@@ -68,7 +68,7 @@ object PokemonManager: Logging {
             )
             .addField(
                 "EV Points",
-                pokemon.stats.filter { it.effort > 0 }.map { "${it.effort} ${it.stat.name}" }.joinToString("\n"),
+                pokemon.stats.filter { it.effort > 0 }.joinToString("\n") { "${it.effort} ${it.stat.name}" },
                 true
             )
             .addField(
@@ -91,7 +91,7 @@ object PokemonManager: Logging {
             .build()
     }
 
-    private val host = "https://pokeapi.co/api/v2/"
+    private const val host = "https://pokeapi.co/api/v2/"
 
     @OptIn(ExperimentalSerializationApi::class)
     private val json = Json {
@@ -116,7 +116,6 @@ object PokemonManager: Logging {
 
     private fun pokemonSpeciesEndpoint(name: String): PokemonSpecies {
         val response = runBlocking { Api.makeRequest("${host}/pokemon-species/$name") }
-        println("\n\n$response\n\n")
         val species = json.decodeFromString<PokemonSpecies>(response)
         return species.copy(
             flavorTexts = listOf(species.flavorTexts
@@ -136,13 +135,13 @@ object PokemonManager: Logging {
         )
     }
 
-    fun getPokemon(name: String): PokemonHandle {
+    private fun getPokemon(name: String): PokemonHandle {
         val pokemon = pokemonEndpoint(name)
         val pokemonSpecies = pokemonSpeciesEndpoint(name)
 
         return PokemonHandle(
-            pokemon.copy(abilities = pokemon.abilities.map {
-                it.copy(shortText = pokemonAbilityEndpoint(it.name.url)
+            pokemon.copy(abilities = pokemon.abilities.map { ability ->
+                ability.copy(shortText = pokemonAbilityEndpoint(ability.name.url)
                     .effectEntries
                     .last { it.language.name == "en" }
                     .shortEffect

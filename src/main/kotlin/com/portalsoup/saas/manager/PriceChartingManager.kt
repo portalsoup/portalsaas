@@ -1,15 +1,13 @@
 package com.portalsoup.saas.manager
 
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.core.BenchmarkResult
-import com.portalsoup.saas.core.Logging
-import com.portalsoup.saas.core.log
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.core.measureDuration
 import com.portalsoup.saas.data.tables.pricecharting.VideoGame
 import com.portalsoup.saas.data.tables.pricecharting.VideoGamePriceTable
 import com.portalsoup.saas.data.tables.pricecharting.VideoGameTable
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -26,9 +24,10 @@ import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
-class PriceChartingManager(val httpClient: HttpClient = HttpClient(CIO)): KoinComponent, Logging {
+class PriceChartingManager: KoinComponent, Logging {
 
     private val appConfig by inject<AppConfig>()
+    private val httpClient by inject<HttpClient>()
 
     private val gamesPersisted = AtomicInteger(0)
     private val gamePricesPersisted = AtomicInteger(0)
@@ -48,13 +47,12 @@ class PriceChartingManager(val httpClient: HttpClient = HttpClient(CIO)): KoinCo
                         while (!packet.isEmpty) {
                             val bytes = packet.readBytes()
                             tmpFile.appendBytes(bytes)
-                            println("Received ${tmpFile.length()} bytes from ${response.contentLength()}")
+                            log().info("Received ${tmpFile.length()} bytes from ${response.contentLength()}")
                         }
                     }
                 }
             }
             tmpFile.bufferedReader().useLines { seq ->
-                println("Entered the buffered reader")
                 seq
                     .filterIndexed { i, _ -> i > 0 } // Remove the header row
                     .forEach(::parseCsvRow)
@@ -68,7 +66,6 @@ class PriceChartingManager(val httpClient: HttpClient = HttpClient(CIO)): KoinCo
         val now = LocalDate.now()
         val split = line.split(",")
         gamesProcessed.getAndIncrement()
-        println("Found a line ${split.joinToString("     ")}")
         val container = VideoGameContainer(
             id = split[0].toInt(),
             console = split[1],

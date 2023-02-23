@@ -1,6 +1,7 @@
 package com.portalsoup.saas.manager.card
 
-import com.portalsoup.saas.core.Api
+import com.portalsoup.saas.core.*
+import com.portalsoup.saas.core.extensions.*
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.rest.util.Color
 import kotlinx.coroutines.Deferred
@@ -8,16 +9,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONObject
 
-class MagicManager: CardManager() {
+class MagicManager: CardManager(), Logging {
 
-    val url = "https://api.scryfall.com/cards/named?fuzzy="
-    val errorText = "Oops, something went wrong"
+    private val url = "https://api.scryfall.com/cards/named?fuzzy="
+    private val errorText = "Oops, something went wrong"
 
-    val noResultsText = "Didn't find the card.  The search could have been too broad to confidently" +
+    private val noResultsText = "Didn't find the card.  The search could have been too broad to confidently" +
             " pick the correct match, or didn't match any cards at all."
 
     override suspend fun getRawCardAsync(term: String): Deferred<JSONObject> = coroutineScope {
-        async { JSONObject(Api.makeRequest(url + term)).also { println(it) } }
+        async { JSONObject(Api.makeRequest(url + term)) }
     }
 
     override fun getImageUriFromJson(json: JSONObject): String =
@@ -39,22 +40,22 @@ class MagicManager: CardManager() {
     suspend fun embed(term: String): EmbedCreateSpec {
         val card = getRawCardAsync(term).await()
 
-        println(card.toString(4))
+        log().info(card.toString(4))
 
-        val color = determineColor(kotlin.runCatching { card.getJSONArray("color_identity") }.getOrNull()?.toList())
-        val cardName = kotlin.runCatching { card.getString("name") }.getOrNull() ?: ""
-        val uri = kotlin.runCatching { card.getString("scryfall_uri") }.getOrNull() ?: ""
+        val color = determineColor(card.safeGetJsonArray("color_identity")?.toList())
+        val cardName = card.safeGetString("name") ?: ""
+        val uri = card.safeGetString("scryfall_uri") ?: ""
         val costLabel = "Mana Cost"
-        val cost = kotlin.runCatching { card.getString("mana_cost") }.getOrNull() ?: ""
-        val oracleText = kotlin.runCatching { card.getString("oracle_text") }.getOrNull() ?: ""
-        val flavorText = kotlin.runCatching { card.getString("flavor_text") }.getOrNull() ?: ""
-        val cardImage = kotlin.runCatching { card.getJSONObject("image_uris").getString("large") }.getOrNull() ?: ""
-        val artCrop = kotlin.runCatching { card.getJSONObject("image_uris").getString("art_crop") }.getOrNull() ?: ""
-        val atkLabel = kotlin.runCatching { card.getString("Power") }.getOrNull() ?: ""
-        val atk = kotlin.runCatching { card.getString("power") }.getOrNull() ?: ""
-        val defLabel = kotlin.runCatching { card.getString("Toughness") }.getOrNull() ?: ""
-        val def = kotlin.runCatching { card.getString("toughness") }.getOrNull() ?: ""
-        val spellType = kotlin.runCatching { card.getString("type_line") }.getOrNull() ?: ""
+        val cost = card.getString("mana_cost") ?: ""
+        val oracleText = card.safeGetString("oracle_text") ?: ""
+        val flavorText = card.safeGetString("flavor_text") ?: ""
+        val cardImage = card.safeGetJSONObject("image_uris")?.safeGetString("large") ?: ""
+        val artCrop = card.safeGetJSONObject("image_uris")?.safeGetString("art_crop") ?: ""
+        val atkLabel = card.safeGetString("Power") ?: ""
+        val atk = card.safeGetString("power") ?: ""
+        val defLabel = card.safeGetString("Toughness") ?: ""
+        val def = card.safeGetString("toughness") ?: ""
+        val spellType = card.safeGetString("type_line") ?: ""
 
 
         return EmbedCreateSpec.builder()
@@ -74,7 +75,7 @@ class MagicManager: CardManager() {
             .build()
     }
 
-    fun determineColor(identity: MutableList<Any>?): Color {
+    private fun determineColor(identity: MutableList<Any>?): Color {
         return if (identity.isNullOrEmpty()) {
             Color.GRAY
         } else if (identity.size > 1) {

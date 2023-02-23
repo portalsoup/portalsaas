@@ -11,20 +11,10 @@ object JoinVoiceCommand: Command, KoinComponent {
 
     private val audioProvider by inject<LavaPlayerAudioProvider>()
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
-        println("Received command!  [!join]")
         return Mono.justOrEmpty(event.member)
-            .flatMap {
-                println("Getting voice state")
-                it.voiceState
-            }
-            .flatMap {
-                println("Getting channel")
-                it.channel
-            }
-            .flatMap {
-                println("Joining with audio provider")
-                it.join().withProvider(audioProvider)
-            }
+            .flatMap { it.voiceState }
+            .flatMap { it.channel }
+            .flatMap { it.join().withProvider(audioProvider) }
             .then()
     }
 }

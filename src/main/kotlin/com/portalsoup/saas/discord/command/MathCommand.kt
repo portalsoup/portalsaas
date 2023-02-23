@@ -27,7 +27,7 @@ object MathCommand: Command {
 
         return if (result.isFailure) {
             event.message.channel
-                .flatMap { it.createMessage("That's not real math") }
+                .flatMap { it.createMessage("I didn't understand that") }
                 .then()
         } else {
             event.message.channel

@@ -1,8 +1,8 @@
 package com.portalsoup.saas.discord
 
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.core.Logging
-import com.portalsoup.saas.core.log
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.discord.command.Command
 import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
@@ -28,9 +28,9 @@ class DiscordBot: KoinComponent, Logging {
 
     private val appConfig by inject<AppConfig>()
 
-    val commands = hashMapOf<String, Command>()
+    private val commands = hashMapOf<String, Command>()
 
-    val client: GatewayDiscordClient = DiscordClient.create(appConfig.discordToken)
+    private val client: GatewayDiscordClient = DiscordClient.create(appConfig.discordToken)
         .gateway()
         .setEnabledIntents(IntentSet.of(
             Intent.DIRECT_MESSAGES,
@@ -61,7 +61,7 @@ class DiscordBot: KoinComponent, Logging {
             .subscribe()
     }
 
-    fun initCommands() {
+    private fun initCommands() {
 
         commands["ping"] = PingPongCommand
         commands["math"] = MathCommand
@@ -80,5 +80,5 @@ class DiscordBot: KoinComponent, Logging {
         const val COMMAND_PREFIX: String = "!"
     }
 
-    fun String.commandPrefix() = COMMAND_PREFIX + this
+    private fun String.commandPrefix() = COMMAND_PREFIX + this
 }

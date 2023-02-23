@@ -1,6 +1,6 @@
 package com.portalsoup.saas.discord.command.friendcode
 
-import com.portalsoup.saas.core.log
+import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.data.tables.FriendCodeTable
 import com.portalsoup.saas.discord.command.Command
 import discord4j.core.event.domain.message.MessageCreateEvent
