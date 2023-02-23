@@ -30,7 +30,7 @@ object VideoGameLookupCommand: Command, Logging {
                 |FROM
                 |  video_game as vg
                 |  LEFT OUTER JOIN video_game_price ON video_game_price.video_game_id = vg.pricecharting_id
-                |ORDER by dist LIMIT $resultLimit;
+                |ORDER by dist, price_date LIMIT $resultLimit;
             """.trimMargin().execAndMap {
                     println("Processing a result")
                     val result = Result(

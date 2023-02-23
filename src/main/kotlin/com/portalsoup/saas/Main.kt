@@ -72,15 +72,20 @@ fun Application.coreModule() {
         )
     }
 
+//    PriceChartingManager().updateLoosePriceGuide()
+
     log.info("Initializing routing...")
     routing {
         healthcheckApi()
         helloWorldApi()
     }
-    log.info("Initializing discord bot...")
-    DiscordBot().init()
+    if (!appConfig.discordToken.isNullOrEmpty()) {
+        log.info("Initializing discord bot...")
+        DiscordBot().init()
+        log.info("Discord bot ready to go")
 
-    log.info("Discord bot ready to go")
+    }
+
 }
 
 data class TestInjection(val str: String)

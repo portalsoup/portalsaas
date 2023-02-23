@@ -11,8 +11,8 @@ object DiceRollCommand: Command {
         val match = regex.matchEntire(truncatedMessage)
         val values = match?.groups
 
-        val die = values?.get("die")?.value?.takeIf { it.isNotEmpty() }?.toInt() ?: 1
-        val faces = values?.get("faces")?.value?.takeIf { it.isNotEmpty() }?.toInt() ?: 20
+        val die = values?.get("die")?.value?.takeIf { it.isNotEmpty() }?.toInt()?.takeIf { it <= 50 } ?: 1
+        val faces = values?.get("faces")?.value?.takeIf { it.isNotEmpty() }?.toInt()?.takeIf { it < Int.MAX_VALUE - 1 } ?: 20
 
         return event.message.channel.flatMap { ch ->
             EmbedCreateSpec.builder()

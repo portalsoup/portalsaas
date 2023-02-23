@@ -1,6 +1,9 @@
 package com.portalsoup.saas.quartz
 
+import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.scheduler
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.quartz.CronScheduleBuilder
 import org.quartz.CronScheduleBuilder.cronSchedule
 import org.quartz.CronScheduleBuilder.dailyAtHourAndMinute
@@ -8,11 +11,20 @@ import org.quartz.Job
 import org.quartz.JobBuilder.newJob
 import org.quartz.TriggerBuilder.newTrigger
 
-object QuartzModule {
+object QuartzModule: KoinComponent {
+
+    val appConfig by inject<AppConfig>()
 
     fun init() {
         println("initializing ")
-        initJob(PriceChartingUpdateJob::class.java, "update-price-guide", "pricecharting", dailyAtHourAndMinute(0, 0))
+        if (appConfig.pricechartingToken.isNotEmpty()) {
+            initJob(
+                PriceChartingUpdateJob::class.java,
+                "update-price-guide",
+                "pricecharting",
+                dailyAtHourAndMinute(0, 0)
+            )
+        }
     }
 
     private fun initJob(job: Class<out Job>, identity: String, group: String, schedule: CronScheduleBuilder) {
