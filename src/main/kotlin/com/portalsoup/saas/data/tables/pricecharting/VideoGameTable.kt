@@ -15,7 +15,7 @@ object VideoGameTable : IntIdTable("video_game") {
 }
 
 data class VideoGame(
-    val id: Int?,
+    val id: Int,
     val pricechartingId: Int,
     val consoleName: String,
     val productName: String,
@@ -32,14 +32,25 @@ data class VideoGame(
             updatedOn = resultRow[VideoGameTable.updatedOn]
         )
 
-        fun fromSet(resultSet: ResultSet): VideoGame = VideoGame(
-            id = kotlin.runCatching { resultSet.getInt("id") }.getOrNull(),
-            pricechartingId = resultSet.getInt("pricecharting_id"),
-            consoleName = resultSet.getString("console_name"),
-            productName = resultSet.getString("console_name"),
-            createdOn = resultSet.getDate("console_name").toLocalDate(),
-            updatedOn = resultSet.getDate("console_name").toLocalDate()
-        )
+        fun fromSet(resultSet: ResultSet): VideoGame {
+            printColumnDetails(resultSet)
+            return VideoGame(
+                id = resultSet.getInt("id"),
+                pricechartingId = resultSet.getInt("pricecharting_id"),
+                consoleName = resultSet.getString("console_name"),
+                productName = resultSet.getString("product_name"),
+                createdOn = resultSet.getDate("created_on").toLocalDate(),
+                updatedOn = resultSet.getDate("updated_on").toLocalDate()
+            )
+        }
+
+        fun printColumnDetails(resultSet: ResultSet) {
+            println("About to count columns")
+            for (i in 1..resultSet.metaData.columnCount) {
+                val columnName = resultSet.metaData.getColumnName(i)
+                println("Found the column: [${columnName}]=${resultSet.getString(columnName)}")
+            }
+        }
 
     }
 }

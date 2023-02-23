@@ -52,7 +52,7 @@ class DiscordBot: KoinComponent, Logging {
                         Flux.fromIterable(commands.entries)
                             .filter { content.startsWith(it.key.commandPrefix()) }
                             .flatMap { runCatching {
-                                it.value.execute(event, event.message.content.removePrefix(it.key.commandPrefix()))
+                                it.value.execute(event, event.message.content.removePrefix(it.key.commandPrefix()).trim())
                             }.getOrElse { Mono.empty() } }
                             .next()
                     }
