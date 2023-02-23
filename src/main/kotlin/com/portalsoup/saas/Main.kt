@@ -8,6 +8,8 @@ import com.portalsoup.saas.discord.DiscordBot
 import com.portalsoup.saas.discord.LavaPlayerAudioProvider
 import com.portalsoup.saas.discord.TrackScheduler
 import com.portalsoup.saas.manager.PriceChartingManager
+import com.portalsoup.saas.quartz.PriceChartingUpdateJob
+import com.portalsoup.saas.quartz.QuartzModule
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
@@ -19,10 +21,16 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.withTimeout
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import org.quartz.impl.StdSchedulerFactory
 
 fun main(args: Array<String>) {
+    scheduler.start()
     EngineMain.main(args)
+    scheduler.shutdown()
 }
+
+val scheduler = StdSchedulerFactory.getDefaultScheduler()
+
 
 fun Application.coreModule() {
     log.info("Initializing core module...")
@@ -52,15 +60,17 @@ fun Application.coreModule() {
         single { LavaPlayerAudioProvider(player) }
         single { TrackScheduler(player) }
         single { ktorClient }
+        single { scheduler }
     }
+
+    // collect quartz jobs
+    QuartzModule.init()
 
     startKoin {
         modules(
             appModule
         )
     }
-
-//    PriceChartingManager().updateLoosePriceGuide()
 
     log.info("Initializing routing...")
     routing {
