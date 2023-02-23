@@ -63,14 +63,14 @@ fun Application.coreModule() {
         single { scheduler }
     }
 
-    // collect quartz jobs
-    QuartzModule.init()
-
     startKoin {
         modules(
             appModule
         )
     }
+
+    // collect quartz jobs
+    QuartzModule.init()
 
 //    PriceChartingManager().updateLoosePriceGuide()
 
