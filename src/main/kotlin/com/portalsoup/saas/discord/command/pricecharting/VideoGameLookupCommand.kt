@@ -2,7 +2,6 @@ package com.portalsoup.saas.discord.command.pricecharting
 
 import com.portalsoup.saas.core.Logging
 import com.portalsoup.saas.core.db.execAndMap
-import com.portalsoup.saas.core.log
 import com.portalsoup.saas.data.tables.pricecharting.VideoGame
 import com.portalsoup.saas.data.tables.pricecharting.VideoGamePrice
 import com.portalsoup.saas.data.tables.pricecharting.VideoGamePriceTable
@@ -14,38 +13,64 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDate
 import java.util.stream.Collectors
 
 object VideoGameLookupCommand: Command, Logging {
 
-    private const val resultLimit = 10
+    private const val resultLimit = 50
+    private const val discordResultLimit = 3L
 
-    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
-        val message = event.message
-
-        return kotlin.runCatching { transaction {
-            // Raw query is required here because of the trigrams extension
-            """
-                |SELECT *, product_name <<-> '$truncatedMessage' as dist
-                |   FROM video_game
-                |   ORDER BY dist
-                |   LIMIT $resultLimit
-            """.trimMargin().execAndMap { VideoGame.fromSet(it) }
+    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> =
+        runCatching {
+            transaction {
+                // Raw query is required here because of the trigrams extension
+                """
+                |SELECT
+                |  vg.pricecharting_id,
+                |  vg.product_name || vg.console_name <-> '$truncatedMessage' as dist,
+                |  vg.product_name,
+                |  vg.console_name,
+                |  loose_price,
+                |  video_game_price.created_on as price_date
+                |FROM
+                |  video_game as vg
+                |  LEFT OUTER JOIN video_game_price ON video_game_price.video_game_id = vg.pricecharting_id
+                |ORDER by dist LIMIT $resultLimit;
+            """.trimMargin().execAndMap {
+                    println("Processing a result")
+                    val result = Result(
+                        name = it.getString("product_name"),
+                        console = it.getString("console_name"),
+                        price = it.getString("loose_price"),
+                        pricechartingId = it.getString("pricecharting_id"),
+                        priceDate = it.getDate("price_date").toLocalDate()
+                    )
+                    println(result)
+                    result
+                }
+            }
         }
-        }
+            .onFailure { println("An exception was thrown! ${it.message}") }
             .getOrElse { emptyList() }
+            .sortedBy { it.priceDate }
+            .distinctBy { it.pricechartingId }
+            .groupBy { it.name }
+            .map { grouped -> FoundVideoGame(grouped.key, grouped.value.associate { it.console to it.price }) }
             .let { Flux.fromIterable(it) } // It is now a Flux
+            .take(discordResultLimit)
             .map(::formatGameString)
             .collect(Collectors.joining("\n"))
-            .flatMap { msg ->  message.channel.flatMap {
-                val msgPrefix = msg.takeUnless { m -> m.isEmpty() }?.let { "I found a couple game matches:" } ?: "I didn't find any games that match"
-                it.createMessage("$msgPrefix\n${msg}") } }
+            .flatMap { msg ->  event.message.channel.flatMap {
+                val msgPrefix = msg.takeUnless { m -> m.isEmpty() }?.let { "I found a couple possible matches:" } ?: "I didn't find any games that match"
+                it.createMessage("$msgPrefix\n${msg ?: ""}") } }
             .then()
-            ?: message.channel.flatMap { it.createMessage("I couldn't find any games that matched") }.then()
-    }
+            ?: event.message.channel.flatMap { it.createMessage("I couldn't find any games that matched") }.then()
 
-    private fun formatGameString(game: VideoGame): String =
-        "${game.productName} - ${game.consoleName} ${getPriceOfGame(game)?.loosePrice?.let { ": $it" } ?: ""}"
+
+    private fun formatGameString(game: FoundVideoGame): String = "" +
+            "${game.name} - ${takeIf { game.consoles.size > 1 }?.let { "\n\t" } ?: "" }" +
+            game.consoles.map { "${it.key}: ${it.value ?: ""}" }.joinToString("\n\t")
 
     private fun getPriceOfGame(game: VideoGame): VideoGamePrice? = transaction {
         game.id
@@ -69,7 +94,9 @@ object VideoGameLookupCommand: Command, Logging {
     }
 }
 
-data class FoundVideoGame(val name: String, val consoles: HashMap<String, String?>)
+data class Result(val pricechartingId: String, val name: String, val console: String, val price: String?, val priceDate: LocalDate)
+
+data class FoundVideoGame(val name: String, val consoles: Map<String, String?>)
 
 /*
 
@@ -81,7 +108,7 @@ SELECT
   loose_price
 FROM
   video_game as vg
-  LEFT OUTER JOIN video_game_price ON video_game_price.video_game_id = vg.id
+  LEFT OUTER JOIN video_game_price ON video_game_price.video_game_id = vg.pricecharting_id
 ORDER by dist LIMIT 25;
 
 */

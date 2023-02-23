@@ -4,6 +4,7 @@ import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.Logging
 import com.portalsoup.saas.core.log
 import com.portalsoup.saas.discord.command.Command
+import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
 import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
 import com.portalsoup.saas.discord.command.PingPongCommand
@@ -72,6 +73,7 @@ class DiscordBot: KoinComponent, Logging {
         commands["mtg"] = MtgCommand
 //        commands["pokedex"] = PokedexCommand
         commands["vg"] = VideoGameLookupCommand
+        commands["roll"] = DiceRollCommand
     }
 
     companion object {
