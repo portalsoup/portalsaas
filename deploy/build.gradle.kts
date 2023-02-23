@@ -22,8 +22,7 @@ repositories {
 // Variables required from gradle.properties
 val priceChartingKey: String by project
 val doToken: String by project
-val deploySshId: String by project
-val ansibleDeployIP: String by project
+val doSshId: String by project
 val discordToken: String by project
 val pricechartingToken: String by project
 
@@ -64,7 +63,7 @@ tasks {
 
         doLast {
             project.exec {
-                workingDir("$terraformDir")
+                workingDir(terraformDir)
                 commandLine("terraform", "init",
                     "-var", "do_token=$doToken"
                 )
@@ -94,7 +93,7 @@ tasks {
             val planResult = project.exec {
                 workingDir(terraformDir)
                 commandLine("terraform", "plan",
-                    "-var", "ssh_id=${deploySshId}",
+                    "-var", "ssh_id=${doSshId}",
                     "-var", "do_token=$doToken"
                 )
             }
@@ -125,7 +124,7 @@ tasks {
                 workingDir(terraformDir)
                 commandLine("terraform", "apply",
                     "-auto-approve",
-                    "-var", "ssh_id=${deploySshId}",
+                    "-var", "ssh_id=${doSshId}",
                     "-var", "do_token=$doToken"
                 )
             }
@@ -135,6 +134,7 @@ tasks {
     register("terraform-db-output") {
         group = "deploy"
 
+        @Suppress("UnstableApiUsage")
         doNotTrackState("We should not cache secrets")
 
         onlyIf {
@@ -205,6 +205,7 @@ tasks {
             File("$terraformDir/terraform.tfstate").exists()
         }
 
+        @Suppress("UnstableApiUsage")
         doNotTrackState("We should not cache secrets")
 
         val dropletIpStream = ByteArrayOutputStream()
