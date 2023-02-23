@@ -7,7 +7,7 @@ import kotlin.random.Random
 
 object DiceRollCommand: Command {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
-        val regex = "\\D*(?<die>\\d*)[dD](?<faces>\\d*)\\D*".toRegex()
+        val regex = "\\D*(?<die>\\d*)\\s*[dD]\\s*(?<faces>\\d*)\\D*".toRegex()
         val match = regex.matchEntire(truncatedMessage)
         val values = match?.groups
 

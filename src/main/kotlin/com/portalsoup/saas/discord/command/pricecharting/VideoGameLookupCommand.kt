@@ -62,7 +62,7 @@ object VideoGameLookupCommand: Command, Logging {
             .map(::formatGameString)
             .collect(Collectors.joining("\n"))
             .flatMap { msg ->  event.message.channel.flatMap {
-                val msgPrefix = msg.takeUnless { m -> m.isEmpty() }?.let { "I found a couple possible matches:" } ?: "I didn't find any games that match"
+                val msgPrefix = msg.takeUnless { m -> m.isEmpty() }?.let { "I found a few possible matches with loose prices:" } ?: "I didn't find any games that match"
                 it.createMessage("$msgPrefix\n${msg ?: ""}") } }
             .then()
             ?: event.message.channel.flatMap { it.createMessage("I couldn't find any games that matched") }.then()
