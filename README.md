@@ -66,7 +66,7 @@ My typical developer flow is:
 
 Deployment is performed using Terraform and Ansible, both tools are delegated through Gradle via Gradle tasks.
 
-To being the deployment process, ensure both a valid production Ktor `application.conf` file exists in the resources/ 
+To begin the deployment process, ensure both a valid production Ktor `application.conf` file exists in the resources/ 
 directory, then build a jar:
 
     ./gradlew ktor-config shadowJar
@@ -98,4 +98,4 @@ Production consists of the following DigitalOcean resources:
 * A droplet running the app
 * A Postgresql cluster
 
-The app is loaded into a systemd using an init script which handles auto-running and restarts 
+The app is loaded using systemd with an init script which handles auto-running and restarts on the server.
