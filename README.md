@@ -33,17 +33,17 @@ and be a stable place to deploy personally useful code.
 * Ansible
 
 
-# Required properties
+# Gradle properties
 
-The Gradle.properties file contains app secrets and so isn't checked into the repository.  
+The `gradle.properties` file contains app secrets and so isn't checked into the repository.  Define these values:
 
     pricechartingToken={}
     doToken={}
     doSshId={}
     discordToken={}
 
-`pricechartingToken` and `discordToken` are optional, and starting the app without them simply won't initialize those features.
-`doToken` and `doSshId` are both required DigitalOcean properties if the app is to be deployed to a production server.
+`pricechartingToken` and `discordToken` are optional, and starting the app without them skips initializing those features.
+`doToken` and `doSshId` are both required DigitalOcean properties only if the app is to be deployed to a production server.
 
 # Run locally
 To run the app locally, run these commands:
@@ -66,8 +66,8 @@ My typical developer flow is:
 
 Deployment is performed using Terraform and Ansible, both tools are delegated through Gradle via Gradle tasks.
 
-To begin the deployment process, ensure both a valid production Ktor `application.conf` file exists in the resources/ 
-directory, then build a jar:
+To begin the deployment process, ensure that Ktor's `application.conf` file has been generated in the resources/ 
+directory by invoking Gradle's `ktor-config` task, then build a jar:
 
     ./gradlew ktor-config shadowJar
 
@@ -78,24 +78,3 @@ Once this artifact is built and tested, it can be deployed using:
 
 This deploy task will walk you through multiple Terraform and Ansible operations, including displaying the calculated 
 `terraform plan` output and requiring you to accept on the command line before performing any destructive operations.
-
-
-# Environments
-
-## Local
-
-The local environment is run across 2 docker containers:
-* app
-* db
-
-`app` is an alpine container running Java that runs the file `/app/shadow.jar`, this file is mounted from the host using
-the jar currently in the build output folder.  The JDBC connection details are overridden in the project's `docker-compose.yaml`
-file, and are favored over `application.yaml` whenever present.
-
-## Production
-
-Production consists of the following DigitalOcean resources:
-* A droplet running the app
-* A Postgresql cluster
-
-The app is loaded using systemd with an init script which handles auto-running and restarts on the server.
