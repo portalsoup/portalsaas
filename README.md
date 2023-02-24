@@ -33,17 +33,17 @@ and be a stable place to deploy personally useful code.
 * Ansible
 
 
-# Required properties
+# Gradle properties
 
-The Gradle.properties file contains app secrets and so isn't checked into the repository.  
+The `gradle.properties` file contains app secrets and so isn't checked into the repository.  Define these values:
 
     pricechartingToken={}
     doToken={}
     doSshId={}
     discordToken={}
 
-`pricechartingToken` and `discordToken` are optional, and starting the app without them simply won't initialize those features.
-`doToken` and `doSshId` are both required DigitalOcean properties if the app is to be deployed to a production server.
+`pricechartingToken` and `discordToken` are optional, and starting the app without them skips initializing those features.
+`doToken` and `doSshId` are both required DigitalOcean properties only if the app is to be deployed to a production server.
 
 # Run locally
 To run the app locally, run these commands:
@@ -64,10 +64,10 @@ My typical developer flow is:
 
 # Deploy
 
-Deployment is performed using Terraform and Ansible, both tools are delegated through Gradle via Gradle tasks.
+Deployment to DigitalOcean is automated using Terraform and Ansible, both tools are delegated through Gradle via Gradle tasks.
 
-To being the deployment process, ensure both a valid production Ktor `application.conf` file exists in the resources/ 
-directory, then build a jar:
+To begin the deployment process, ensure that Ktor's `application.conf` file has been generated in the resources/ 
+directory by invoking Gradle's `ktor-config` task, then build a jar:
 
     ./gradlew ktor-config shadowJar
 
