@@ -1,4 +1,23 @@
-My personal web app.
+My personal web app and Discord bot.
+
+This application is both a place for me to experiment with new ideas
+and be a stable place to deploy personally useful code.
+
+# Tech stack
+
+* Kotlin
+  * Ktor-server (Web server)
+  * Ktor-client (Web client)
+  * Discord4j (Discord API bindings)
+  * Exposed (SQL library)
+* Infrastructure
+  * Gradle
+  * Docker
+  * docker-compose
+  * Postgresql
+  * Terraform
+  * Ansible
+  * DigitalOcean
 
 
 # System requirements
