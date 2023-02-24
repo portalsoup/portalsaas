@@ -5,8 +5,8 @@ import org.koin.core.component.KoinComponent
 
 data class AppConfig(
     val jdbcConfig: Jdbc,
-    val discordToken: String,
-    val pricechartingToken: String
+    val discordToken: String?,
+    val pricechartingToken: String?
 ) : KoinComponent {
     companion object {
         fun default(environment: ApplicationEnvironment): AppConfig {

@@ -68,7 +68,7 @@ fun Application.coreModule() {
         helloWorldApi()
     }
 
-    if (appConfig.discordToken.isNotEmpty()) {
+    if (! appConfig.discordToken.isNullOrEmpty()) {
         log.info("Initializing discord bot...")
         DiscordBot().init()
         log.info("Discord bot ready to go")

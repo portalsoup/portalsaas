@@ -21,10 +21,10 @@ repositories {
 
 // Variables required from gradle.properties
 val priceChartingKey: String by project
-val doToken: String by project
-val doSshId: String by project
-val discordToken: String by project
-val pricechartingToken: String by project
+val doToken: String? by project
+val doSshId: String? by project
+val discordToken: String? by project
+val pricechartingToken: String? by project
 
 // Shortcuts
 val ansibleDir = "$rootDir/infrastructure/ansible/"
@@ -288,17 +288,20 @@ tasks.register("ktor-config") {
         val handlebars = Handlebars()
         val template = handlebars.compileInline(rawTemplate)
 
-        val host = ext.get("privateHost")
-        val port = ext.get("port")
-        val db = ext.get("database")
+        // Default values are the local docker config
+        val host = runCatching { ext.get("privateHost") }.getOrNull()
+        val port = runCatching { ext.get("port") }.getOrNull()
+        val db = runCatching { ext.get("database") }.getOrNull()
+        val user = runCatching { ext.get("user").toString() }.getOrNull()
+        val password = runCatching { ext.get("password").toString() }.getOrNull()
 
         val result = template.apply(mapOf(
             "host" to host,
             "port" to port,
             "db" to db,
             "driver" to "org.postgresql.Driver",
-            "username" to ext.get("user").toString(),
-            "password" to ext.get("password").toString(),
+            "username" to user,
+            "password" to password,
             "maxPool" to "10",
             "discordToken" to discordToken,
             "pricechartingToken" to pricechartingToken

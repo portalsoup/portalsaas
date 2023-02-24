@@ -18,7 +18,7 @@ object QuartzModule: KoinComponent, Logging {
 
     fun init() {
         log().info("initializing ")
-        if (appConfig.pricechartingToken.isNotEmpty()) {
+        if (! appConfig.pricechartingToken.isNullOrEmpty()) {
             initJob(
                 PriceChartingUpdateJob::class.java,
                 "update-price-guide",
