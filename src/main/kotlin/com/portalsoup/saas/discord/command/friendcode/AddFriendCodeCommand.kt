@@ -11,6 +11,9 @@ import org.koin.core.component.KoinComponent
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 
+/**
+ * Store your own friend code in the bot's database for future retrieval by you or users in a common server.
+ */
 object AddFriendCodeCommand: IDiscordCommand, KoinComponent {
 
     private val friendCodeRegex = Regex("(SW-\\d{4}-\\d{4}-\\d{4})")

@@ -43,7 +43,6 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:${Versions.ktor}")
     implementation("io.ktor:ktor-network-tls-certificates:${Versions.ktor}")
 
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
 
     implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktor}")
@@ -75,6 +74,7 @@ dependencies {
     implementation("com.sedmelluq:lavaplayer:1.3.77")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
 application {

@@ -10,6 +10,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
 import reactor.core.publisher.Mono
 
+/**
+ * Retrieve your or another user's friend code.
+ *
+ * Retrieving another user's friend code requires an @mention on that user, this restricts the bot to only look up
+ * users that share the common server with the requester.
+ */
 object LookupFriendCodeCommand: KoinComponent, IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val message = event.message

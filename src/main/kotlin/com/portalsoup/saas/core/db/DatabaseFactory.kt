@@ -12,6 +12,10 @@ import org.jetbrains.exposed.sql.Database
 
 class DatabaseFactory: Logging {
 
+    /**
+     * The database's entrypoint, this configures the connection pool with Hikari, and performs necessary migrations
+     * using Flyway.
+     */
     fun init(appConfig: AppConfig) {
         val hikariConfig = HikariConfig().apply {
             jdbcUrl = appConfig.jdbcConfig.url

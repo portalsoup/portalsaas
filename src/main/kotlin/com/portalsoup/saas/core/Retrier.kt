@@ -12,7 +12,16 @@ data class RetryConfig(
     val verbose: Boolean = false
 )
 
+/**
+ * Allows a function to be executed, and if an exception is thrown, to be re-executed after a delay.
+ */
 object Retrier: Logging {
+
+    /**
+     * @param name A unique name to assign to this retry instance
+     * @param config Configures the behavior of this retry instance
+     * @param lambda A function that may fail with an exception to retry
+     */
     operator fun <T> invoke(
         name: String,
         config: RetryConfig = RetryConfig(),

@@ -6,6 +6,9 @@ import discord4j.core.event.domain.message.MessageCreateEvent
 import kotlinx.coroutines.runBlocking
 import reactor.core.publisher.Mono
 
+/**
+ * Look up a magic the gathering card from scryfall and display it's photo and details.
+ */
 object MtgCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val term = event.message.content.split("!mtg").lastOrNull() ?: return Mono.empty()

@@ -4,6 +4,12 @@ import com.notkamui.keval.Keval
 import discord4j.core.event.domain.message.MessageCreateEvent
 import reactor.core.publisher.Mono
 
+/**
+ * Evaluate a math expression and return the float result.
+ *
+ * For example:
+ *   !math 2 + 2
+ */
 object MathCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val expression: String = event.message.content.split("!math").lastOrNull()?.trim() ?: return Mono.empty()
@@ -11,17 +17,6 @@ object MathCommand: IDiscordCommand {
         val result = kotlin.runCatching {
             Keval {
                 includeDefault()
-
-                constant {
-                    name = "nice"
-                    value = 69.0
-                }
-
-                constant {
-                    name = "dank"
-                    value = 420.0
-                }
-
             }.eval(expression)
         }
 

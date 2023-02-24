@@ -5,6 +5,12 @@ import discord4j.core.spec.EmbedCreateSpec
 import reactor.core.publisher.Mono
 import kotlin.random.Random
 
+/**
+ * Roll a number of die and display the results.  If the quantity and faces are omitted, then 1D20 is default.
+ *
+ * Example:
+ *   !roll 5D100
+ */
 object DiceRollCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val regex = "\\D*(?<die>\\d*)\\s*[dD]\\s*(?<faces>\\d*)\\D*".toRegex()

@@ -9,7 +9,6 @@ import io.ktor.client.statement.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-
 object Api: KoinComponent, Logging {
 
     private val client by inject<HttpClient>()

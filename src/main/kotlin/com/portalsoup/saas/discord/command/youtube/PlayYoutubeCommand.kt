@@ -8,6 +8,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import reactor.core.publisher.Mono
 
+/**
+ * Instructs the bot to begin streaming audio from a youtube URL to the currently joined voice channel.
+ */
 object PlayYoutubeCommand: IDiscordCommand, KoinComponent {
 
     private val audioManager by inject<DefaultAudioPlayerManager>()

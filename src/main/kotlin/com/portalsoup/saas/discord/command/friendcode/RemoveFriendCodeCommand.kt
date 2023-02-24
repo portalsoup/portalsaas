@@ -8,6 +8,9 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import reactor.core.publisher.Mono
 
+/**
+ * Remove your own friend code from the bot's database.
+ */
 object RemoveFriendCodeCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val user = event.message.author.orElse(null) ?: return Mono.empty()

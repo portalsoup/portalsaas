@@ -7,6 +7,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import reactor.core.publisher.Mono
 
+/**
+ * Instruct the bot to join the voice channel you are in if able.
+ */
 object JoinVoiceCommand: IDiscordCommand, KoinComponent {
 
     private val audioProvider by inject<LavaPlayerAudioProvider>()

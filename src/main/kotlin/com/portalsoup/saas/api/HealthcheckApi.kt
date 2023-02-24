@@ -7,10 +7,16 @@ import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Routing.healthcheckApi() {
+    /**
+     * Verifies web server health.
+     */
     get("/health") {
         call.respond("Alive!")
     }
 
+    /**
+     * Verifies the database health by executing a query that doesn't depend on the schema state.
+     */
     get("roll") {
         val min = call.parameters["min"] ?: 1
         val max = call.parameters["max"] ?: 6

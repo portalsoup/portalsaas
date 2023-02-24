@@ -5,6 +5,9 @@ import com.portalsoup.saas.manager.PokemonManager
 import discord4j.core.event.domain.message.MessageCreateEvent
 import reactor.core.publisher.Mono
 
+/**
+ * Look up a Pokemon's game details by name using pokeapi.
+ */
 object PokedexCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val term = event.message.content.split("!pokedex").lastOrNull() ?: return Mono.empty()

@@ -11,6 +11,9 @@ import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.stream.Collectors
 
+/**
+ * Look up a video game by name on pricecharting.
+ */
 object VideoGameLookupCommand: IDiscordCommand, Logging {
 
     private const val resultLimit = 50

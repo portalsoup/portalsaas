@@ -26,7 +26,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 /**
- * The main Discord bot entrypoint
+ * The main Discord bot entrypoint.  This class should only be instantiated when appConfig.discordToken is provided.
  */
 class DiscordBot: KoinComponent, Logging {
 
@@ -48,7 +48,7 @@ class DiscordBot: KoinComponent, Logging {
         ?: throw RuntimeException("Failed to connect to Discord")
 
     /**
-     * This is the bot
+     * This is the bot entrypoint
      */
     fun init() {
         log().info("Logged into Discord!")
@@ -69,6 +69,9 @@ class DiscordBot: KoinComponent, Logging {
             .subscribe()
     }
 
+    /**
+     * Set up the commands hashmap so that received events can be matched to behavior.
+     */
     private fun initCommands() {
 
         commands["ping"] = PingPongCommand
