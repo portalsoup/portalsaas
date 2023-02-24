@@ -64,7 +64,7 @@ My typical developer flow is:
 
 # Deploy
 
-Deployment is performed using Terraform and Ansible, both tools are delegated through Gradle via Gradle tasks.
+Deployment to DigitalOcean is automated using Terraform and Ansible, both tools are delegated through Gradle via Gradle tasks.
 
 To begin the deployment process, ensure that Ktor's `application.conf` file has been generated in the resources/ 
 directory by invoking Gradle's `ktor-config` task, then build a jar:
