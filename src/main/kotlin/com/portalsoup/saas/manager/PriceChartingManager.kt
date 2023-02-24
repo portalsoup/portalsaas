@@ -24,6 +24,9 @@ import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
+/**
+ * Collect functionality to interact with Pricecharting's API
+ */
 class PriceChartingManager: KoinComponent, Logging {
 
     private val appConfig by inject<AppConfig>()
@@ -34,6 +37,9 @@ class PriceChartingManager: KoinComponent, Logging {
     private val gamesProcessed = AtomicInteger(0)
     private val gamesFound = AtomicInteger(0)
 
+    /**
+     * Fetch and save the latest video game csv price guide from pricecharting.com
+     */
     fun updateLoosePriceGuide() {
         val durationResult = measureDuration {
             val tmpFile = File.createTempFile("pricecharting", Random.nextDouble().toString())
@@ -55,18 +61,21 @@ class PriceChartingManager: KoinComponent, Logging {
             tmpFile.bufferedReader().useLines { seq ->
                 seq
                     .filterIndexed { i, _ -> i > 0 } // Remove the header row
-                    .forEach(::parseCsvRow)
+                    .forEach(::savePriceGuideRow)
             }
         }
         log().info("Import stats: duration=[${durationResult.duration}] found=[${gamesFound.get()}] processed=[${gamesProcessed.get()}] added=[${gamesPersisted.get()}] new-price=[${gamePricesPersisted.get()}]")
 
     }
 
-    private fun parseCsvRow(line: String) {
+    /**
+     * Parse and persist a line in the price guide csv
+     */
+    private fun savePriceGuideRow(line: String) {
         val now = LocalDate.now()
         val split = line.split(",")
         gamesProcessed.getAndIncrement()
-        val container = VideoGameContainer(
+        val parsedGame = VideoGameContainer(
             id = split[0].toInt(),
             console = split[1],
             product = split[2],
@@ -74,19 +83,19 @@ class PriceChartingManager: KoinComponent, Logging {
         )
 
         val maybeVideoGame: VideoGame? = transaction {
-            val resultRow = VideoGameTable.select { VideoGameTable.priceChartingId eq container.id }.singleOrNull()
+            val resultRow = VideoGameTable.select { VideoGameTable.priceChartingId eq parsedGame.id }.singleOrNull()
             resultRow
                 ?.let { VideoGame.fromRow(it) }
         }
 
         if (maybeVideoGame == null) {
-            log().info("Found a new game $container")
+            log().info("Found a new game $parsedGame")
             gamesPersisted.incrementAndGet()
             transaction {
                 VideoGameTable.insert {
-                    it[priceChartingId] = container.id
-                    it[consoleName] = container.console
-                    it[productName] = container.product
+                    it[priceChartingId] = parsedGame.id
+                    it[consoleName] = parsedGame.console
+                    it[productName] = parsedGame.product
                     it[createdOn] = now
                     it[updatedOn] = now
                 }
@@ -96,12 +105,15 @@ class PriceChartingManager: KoinComponent, Logging {
         transaction {
             gamePricesPersisted.incrementAndGet()
             VideoGamePriceTable.insert {
-                it[videoGameId] = container.id
-                it[loosePrice] = container.price
+                it[videoGameId] = parsedGame.id
+                it[loosePrice] = parsedGame.price
                 it[createdOn] = now
             }
         }
     }
 }
 
+/**
+ * A container for a single row in the price guide csv
+ */
 data class VideoGameContainer(val id: Int, val console: String, val product: String, val price: String?)

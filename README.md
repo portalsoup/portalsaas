@@ -99,3 +99,21 @@ Production consists of the following DigitalOcean resources:
 * A Postgresql cluster
 
 The app is loaded into a systemd using an init script which handles auto-running and restarts 
+
+# Discord Bot details
+
+Available commands:
+
+| command                            | details                                                                                                                |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| ping                               | Responds "pong"                                                                                                        |
+| math                               | Evaluates math expressions                                                                                             |
+| join                               | If the user is in a voice channel, the bot will join the same                                                          |
+| play {youtubeUrl}                  | Instructs the bot to stream audio from a Youtube url to the current voice channel                                      |
+| friendcode                         | lookup and display the user's friend code, or another user's using @mention                                            |
+| friendcode add {SW-XXXX-XXXX-XXXX} | Add your friendcode so friends can lookup your friend code                                                             |
+| friendcode remove                  | Remove your own friend code from the bot's memory                                                                      |
+| mtg                                | Lookup magic cards by name on scryfall and print their details and images                                              |
+| pokedex                            | Lookup pokedex entries on pokeapi and print their details and images                                                   |
+| vg                                 | Lookup loose video game prices by name on pricecharting                                                                |
+| roll {int}d{int}                   | Roll a number of n sided dice.  First number is quantity of die, second number is faces on each die.  Defaults to 1D20 |

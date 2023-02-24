@@ -1,4 +1,4 @@
-package com.portalsoup.saas.manager.card
+package com.portalsoup.saas.manager
 
 import com.portalsoup.saas.core.*
 import com.portalsoup.saas.core.extensions.*
@@ -9,36 +9,18 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONObject
 
-class MagicManager: CardManager(), Logging {
+/**
+ * Collect functionality to interact with scryfall's API
+ */
+class MtgManager: Logging {
 
     private val url = "https://api.scryfall.com/cards/named?fuzzy="
-    private val errorText = "Oops, something went wrong"
 
-    private val noResultsText = "Didn't find the card.  The search could have been too broad to confidently" +
-            " pick the correct match, or didn't match any cards at all."
-
-    override suspend fun getRawCardAsync(term: String): Deferred<JSONObject> = coroutineScope {
-        async { JSONObject(Api.makeRequest(url + term)) }
-    }
-
-    override fun getImageUriFromJson(json: JSONObject): String =
-        when {
-            json.has("image_uris") -> {
-                json
-                    .getJSONObject("image_uris")
-                    .getString("normal").toString()
-            }
-            json.has("details") -> {
-                json
-                    .getString("details")
-            }
-            else -> {
-                throw RuntimeException()
-            }
-        }
-
-    suspend fun embed(term: String): EmbedCreateSpec {
-        val card = getRawCardAsync(term).await()
+    /**
+     * Search for a card by name and return a Discord embedded message object containing the found card's
+     */
+    suspend fun embed(term: String): EmbedCreateSpec? {
+        val card = getRawCardAsync(term).await() ?: return null
 
         log().info(card.toString(4))
 
@@ -75,6 +57,17 @@ class MagicManager: CardManager(), Logging {
             .build()
     }
 
+    /**
+     * Fetch a card by name from scryfall's API.  Scryfall supports fuzzy searching
+     */
+    private suspend fun getRawCardAsync(term: String): Deferred<JSONObject?> = coroutineScope {
+        async { runCatching { JSONObject(Api.makeRequest(url + term)) }.getOrNull() }
+    }
+
+
+    /**
+     * Discord allows adding a strip of color to the left side of the embedded message, so match the card's color
+     */
     private fun determineColor(identity: MutableList<Any>?): Color {
         return if (identity.isNullOrEmpty()) {
             Color.GRAY
@@ -88,22 +81,6 @@ class MagicManager: CardManager(), Logging {
                 "U" -> Color.BLUE
                 "W" -> Color.WHITE
                 else -> Color.GRAY
-            }
-        }
-    }
-
-    override suspend fun getCardImage(term: String): String {
-        val result = kotlin.runCatching {
-            val json = getRawCardAsync(term)
-            getImageUriFromJson(json.await())
-        }
-
-        return if (result.isSuccess) {
-            return result.getOrThrow()
-        } else {
-            when (result.exceptionOrNull()) {
-                is Api.NoResultsFoundException -> noResultsText
-                else -> errorText
             }
         }
     }

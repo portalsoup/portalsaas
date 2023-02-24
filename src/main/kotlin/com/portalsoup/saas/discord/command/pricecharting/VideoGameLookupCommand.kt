@@ -3,7 +3,7 @@ package com.portalsoup.saas.discord.command.pricecharting
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.db.execAndMap
 import com.portalsoup.saas.core.extensions.log
-import com.portalsoup.saas.discord.command.Command
+import com.portalsoup.saas.discord.command.IDiscordCommand
 import discord4j.core.event.domain.message.MessageCreateEvent
 import org.jetbrains.exposed.sql.transactions.transaction
 import reactor.core.publisher.Flux
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.stream.Collectors
 
-object VideoGameLookupCommand: Command, Logging {
+object VideoGameLookupCommand: IDiscordCommand, Logging {
 
     private const val resultLimit = 50
     private const val discordResultLimit = 3L

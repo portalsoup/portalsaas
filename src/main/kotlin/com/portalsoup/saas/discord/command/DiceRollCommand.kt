@@ -5,7 +5,7 @@ import discord4j.core.spec.EmbedCreateSpec
 import reactor.core.publisher.Mono
 import kotlin.random.Random
 
-object DiceRollCommand: Command {
+object DiceRollCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val regex = "\\D*(?<die>\\d*)\\s*[dD]\\s*(?<faces>\\d*)\\D*".toRegex()
         val match = regex.matchEntire(truncatedMessage)

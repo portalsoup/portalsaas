@@ -5,7 +5,7 @@ import com.portalsoup.saas.core.extensions.log
 import discord4j.core.event.domain.message.MessageCreateEvent
 import reactor.core.publisher.Mono
 
-interface Command: Logging {
+interface IDiscordCommand: Logging {
     fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void>
 
     fun fail(reason: String): Mono<Void> {

@@ -1,4 +1,4 @@
-package com.portalsoup.saas.dto
+package com.portalsoup.saas.dto.pokedex
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

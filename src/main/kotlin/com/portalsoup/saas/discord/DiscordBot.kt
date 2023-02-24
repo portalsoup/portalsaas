@@ -3,7 +3,7 @@ package com.portalsoup.saas.discord
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
-import com.portalsoup.saas.discord.command.Command
+import com.portalsoup.saas.discord.command.IDiscordCommand
 import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
 import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
@@ -12,6 +12,7 @@ import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.AddFriendCodeCommand
 import com.portalsoup.saas.discord.command.friendcode.LookupFriendCodeCommand
 import com.portalsoup.saas.discord.command.friendcode.RemoveFriendCodeCommand
+import com.portalsoup.saas.discord.command.pokedex.PokedexCommand
 import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
 import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
 import discord4j.core.DiscordClient
@@ -24,13 +25,17 @@ import org.koin.core.component.inject
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
+/**
+ * The main Discord bot entrypoint
+ */
 class DiscordBot: KoinComponent, Logging {
 
     private val appConfig by inject<AppConfig>()
 
-    private val commands = hashMapOf<String, Command>()
+    private val commands = hashMapOf<String, IDiscordCommand>()
 
-    private val client: GatewayDiscordClient = DiscordClient.create(appConfig.discordToken)
+    private val client: GatewayDiscordClient = DiscordClient
+        .create(appConfig.discordToken ?: throw RuntimeException("The discord bot should not have been initialized"))
         .gateway()
         .setEnabledIntents(IntentSet.of(
             Intent.DIRECT_MESSAGES,
@@ -42,6 +47,9 @@ class DiscordBot: KoinComponent, Logging {
         .block()
         ?: throw RuntimeException("Failed to connect to Discord")
 
+    /**
+     * This is the bot
+     */
     fun init() {
         log().info("Logged into Discord!")
         initCommands()
@@ -71,7 +79,7 @@ class DiscordBot: KoinComponent, Logging {
         commands["friendcode add"] = AddFriendCodeCommand
         commands["friendcode remove"] = RemoveFriendCodeCommand
         commands["mtg"] = MtgCommand
-//        commands["pokedex"] = PokedexCommand
+        commands["pokedex"] = PokedexCommand
         commands["vg"] = VideoGameLookupCommand
         commands["roll"] = DiceRollCommand
     }

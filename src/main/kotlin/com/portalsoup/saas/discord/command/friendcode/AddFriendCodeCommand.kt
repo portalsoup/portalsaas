@@ -2,7 +2,7 @@ package com.portalsoup.saas.discord.command.friendcode
 
 import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.data.tables.FriendCodeTable
-import com.portalsoup.saas.discord.command.Command
+import com.portalsoup.saas.discord.command.IDiscordCommand
 import discord4j.core.event.domain.message.MessageCreateEvent
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -11,7 +11,7 @@ import org.koin.core.component.KoinComponent
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 
-object AddFriendCodeCommand: Command, KoinComponent {
+object AddFriendCodeCommand: IDiscordCommand, KoinComponent {
 
     private val friendCodeRegex = Regex("(SW-\\d{4}-\\d{4}-\\d{4})")
 

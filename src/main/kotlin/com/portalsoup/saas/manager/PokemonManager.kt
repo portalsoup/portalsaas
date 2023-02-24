@@ -3,21 +3,43 @@ package com.portalsoup.saas.manager
 import com.portalsoup.saas.core.Api
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
-import com.portalsoup.saas.dto.Ability
-import com.portalsoup.saas.dto.Pokemon
-import com.portalsoup.saas.dto.PokemonHandle
-import com.portalsoup.saas.dto.PokemonSpecies
+import com.portalsoup.saas.dto.pokedex.Ability
+import com.portalsoup.saas.dto.pokedex.Pokemon
+import com.portalsoup.saas.dto.pokedex.PokemonHandle
+import com.portalsoup.saas.dto.pokedex.PokemonSpecies
 import discord4j.core.spec.EmbedCreateSpec
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-
+/**
+ * Collect functionality to interact with pokeapi's API
+ */
 object PokemonManager: Logging {
 
-    fun getPokemonByName(pkmnName: String, shiny: Boolean): EmbedCreateSpec {
+    private const val host = "https://pokeapi.co/api/v2/"
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private val json = Json {
+        ignoreUnknownKeys = true
+        explicitNulls = false
+        ignoreUnknownKeys = true
+    }
+
+    /**
+     * Retrieve a Pokemon's pokedex entry by name.
+     *
+     * @return A Discord embed message containing the requested Pokemon's details or null if no
+     *   matching Pokemon is found
+     */
+    fun getPokemonByName(pkmnName: String, shiny: Boolean): EmbedCreateSpec? {
         val pokemonHandle = getPokemon(pkmnName)
+
+        if (pokemonHandle.pokemon == null || pokemonHandle.pokemonSpecies == null) {
+            return null
+        }
+
         val pokemon = pokemonHandle.pokemon
         val species = pokemonHandle.pokemonSpecies
 
@@ -91,20 +113,18 @@ object PokemonManager: Logging {
             .build()
     }
 
-    private const val host = "https://pokeapi.co/api/v2/"
-
-    @OptIn(ExperimentalSerializationApi::class)
-    private val json = Json {
-        ignoreUnknownKeys = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-    }
-
-    private fun pokemonEndpoint(name: String): Pokemon {
+    /**
+     * Fetch a Pokemon's details by name
+     *
+     * @return The found Pokemon or null
+     */
+    private fun pokemonEndpoint(name: String): Pokemon? {
         log().info("Found the name [$name]")
-        val response = runBlocking { Api.makeRequest("${host}/pokemon/$name") }
-        val pokemon = json.decodeFromString<Pokemon>(response)
-        return pokemon.copy(
+        val response = runBlocking {
+            runCatching { Api.makeRequest("${host}/pokemon/$name") }.getOrNull()
+        }
+        val pokemon = response?.let { json.decodeFromString<Pokemon>(response) }
+        return pokemon?.copy(
             wildHoldItems = pokemon.wildHoldItems.map {
                 it.copy(
                     item = it.item,
@@ -114,10 +134,17 @@ object PokemonManager: Logging {
         )
     }
 
-    private fun pokemonSpeciesEndpoint(name: String): PokemonSpecies {
-        val response = runBlocking { Api.makeRequest("${host}/pokemon-species/$name") }
-        val species = json.decodeFromString<PokemonSpecies>(response)
-        return species.copy(
+    /**
+     * Fetch a Pokemon's species details by name
+     *
+     * @return The found PokemonSpecies or null
+     */
+    private fun pokemonSpeciesEndpoint(name: String): PokemonSpecies? {
+        val response = runBlocking {
+            runCatching { Api.makeRequest("${host}/pokemon-species/$name") }.getOrNull()
+        }
+        val species = response?.let { json.decodeFromString<PokemonSpecies>(response) }
+        return species?.copy(
             flavorTexts = listOf(species.flavorTexts
                 .last { it.language.name == "en" }
                 .let { it.copy(text = it.text.replace("[^\\x00-\\x7F]".toRegex(), "")) }
@@ -125,10 +152,15 @@ object PokemonManager: Logging {
         )
     }
 
-    private fun pokemonAbilityEndpoint(url: String): Ability {
-        val response = runBlocking { Api.makeRequest(url) }
-        val ability = json.decodeFromString<Ability>(response)
-        return ability.copy(
+    /**
+     * Fetch a Pokemon's ability details by name
+     *
+     * @return The found Ability or null
+     */
+    private fun pokemonAbilityEndpoint(url: String): Ability? {
+        val response = runBlocking { runCatching {Api.makeRequest(url) }.getOrNull() }
+        val ability = response?.let { json.decodeFromString<Ability>(response) }
+        return ability?.copy(
             effectEntries = listOf(
                 ability.effectEntries.last { it.language.name == "en" }
             )
@@ -138,15 +170,16 @@ object PokemonManager: Logging {
     private fun getPokemon(name: String): PokemonHandle {
         val pokemon = pokemonEndpoint(name)
         val pokemonSpecies = pokemonSpeciesEndpoint(name)
+        val abilities = pokemon?.abilities?.map { ability ->
+            ability.copy(shortText = pokemonAbilityEndpoint(ability.name.url)
+                ?.effectEntries
+                ?.last { it.language.name == "en" }
+                ?.shortEffect
+            )
+        }
 
         return PokemonHandle(
-            pokemon.copy(abilities = pokemon.abilities.map { ability ->
-                ability.copy(shortText = pokemonAbilityEndpoint(ability.name.url)
-                    .effectEntries
-                    .last { it.language.name == "en" }
-                    .shortEffect
-                )
-            }),
+            pokemon?.copy(abilities = abilities ?: emptyList()),
             pokemonSpecies
         )
     }

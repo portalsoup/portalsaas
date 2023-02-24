@@ -1,4 +1,4 @@
-package com.portalsoup.saas.quartz
+package com.portalsoup.saas.quartz.job
 
 import com.portalsoup.saas.manager.PriceChartingManager
 import org.quartz.Job

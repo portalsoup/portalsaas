@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
 
 val scheduler = StdSchedulerFactory.getDefaultScheduler() ?: throw RuntimeException("Failed to initialize quartz factory")
 
-@Suppress("unused")
+@Suppress("unused") // This module is linked from config, it's not actually unused
 fun Application.coreModule() {
     log.info("Initializing core module...")
     val appConfig = AppConfig.default(environment)
@@ -60,7 +60,7 @@ fun Application.coreModule() {
     }
 
     // collect quartz jobs
-    QuartzModule.init()
+    QuartzModule()
 
     log.info("Initializing routing...")
     routing {

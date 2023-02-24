@@ -4,7 +4,7 @@ import com.notkamui.keval.Keval
 import discord4j.core.event.domain.message.MessageCreateEvent
 import reactor.core.publisher.Mono
 
-object MathCommand: Command {
+object MathCommand: IDiscordCommand {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         val expression: String = event.message.content.split("!math").lastOrNull()?.trim() ?: return Mono.empty()
 
