@@ -15,9 +15,13 @@ import com.portalsoup.saas.discord.command.friendcode.RemoveFriendCodeCommand
 import com.portalsoup.saas.discord.command.pokedex.PokedexCommand
 import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
 import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
+import com.portalsoup.saas.manager.MtgManager
 import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
+import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.message.MessageCreateEvent
+import discord4j.discordjson.json.ApplicationCommandRequest
 import discord4j.gateway.intent.Intent
 import discord4j.gateway.intent.IntentSet
 import org.koin.core.component.KoinComponent
@@ -31,6 +35,7 @@ import reactor.core.publisher.Mono
 class DiscordBot: KoinComponent, Logging {
 
     private val appConfig by inject<AppConfig>()
+    private val mtgManager by inject<MtgManager>()
 
     private val commands = hashMapOf<String, IDiscordCommand>()
 
@@ -51,8 +56,11 @@ class DiscordBot: KoinComponent, Logging {
      * This is the bot entrypoint
      */
     fun init() {
+
         log().info("Logged into Discord!")
         initCommands()
+        initGlobalCommandDefinitions()
+        initGlobalCommands()
 
         client.eventDispatcher.on(MessageCreateEvent::class.java)
             .flatMap { event ->
@@ -67,6 +75,26 @@ class DiscordBot: KoinComponent, Logging {
                     }
             }
             .subscribe()
+    }
+
+    private fun initGlobalCommands() {
+        client.on(ChatInputInteractionEvent::class.java) { event ->
+            event.takeIf { it.commandName == "greet" }?.reply("Hello")
+        }.subscribe()
+
+        client.on(ApplicationCommandInteractionEvent::class.java) { event ->
+            event.reply()
+            event.takeIf { it.commandName == "mtg" }?.reply("")
+        }.subscribe()
+    }
+
+    private fun initGlobalCommandDefinitions() {
+        val commands = listOf("greet")
+
+        runCatching {
+            CommandReader(client.restClient).init(commands)
+        }
+            .onFailure { log().error("There was an error registering global commands!", it) }
     }
 
     /**

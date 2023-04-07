@@ -1,0 +1,10 @@
+{
+  "name": "mtg",
+  "description": "Look up a mtg card",
+  "options": [{
+    "name": "card name",
+    "description": "The name of the card",
+    "type": 3,
+    "required": true
+  }]
+}

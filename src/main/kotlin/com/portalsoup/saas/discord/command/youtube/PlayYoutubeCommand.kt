@@ -19,7 +19,7 @@ object PlayYoutubeCommand: IDiscordCommand, KoinComponent {
     override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
         return Mono.justOrEmpty(event.message.content)
             .map { it.split(" ") }
-            .doOnNext { audioManager.loadItem(it[1], scheduler) }
+            .doOnNext { audioManager.loadItem(it[1], scheduler); audioManager }
             .then()
     }
 }
