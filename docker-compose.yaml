@@ -14,6 +14,7 @@ services:
       dockerfile: docker/Dockerfile.server
     networks:
       - server
+      - client
     environment:
       <<: *db-config
     ports:
@@ -35,5 +36,14 @@ services:
     restart: always
     networks:
       - server
+  client:
+    image: httpd:2.4-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - "./client/build:/usr/local/apache2/htdocs/"
+    networks:
+      - client
 networks:
   server:
+  client:

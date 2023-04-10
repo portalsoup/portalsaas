@@ -9,3 +9,5 @@ gradle.properties
 **/application.conf
 **/application.yaml
 **/inventory
+**/node_modules
+**/bundle.js
