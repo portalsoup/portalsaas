@@ -7,10 +7,15 @@ import com.portalsoup.saas.core.db.DatabaseFactory
 import com.portalsoup.saas.discord.DiscordBot
 import com.portalsoup.saas.discord.LavaPlayerAudioProvider
 import com.portalsoup.saas.discord.TrackScheduler
+import com.portalsoup.saas.manager.RssManager
 import com.portalsoup.saas.quartz.QuartzModule
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
+import discord4j.core.DiscordClient
+import discord4j.core.GatewayDiscordClient
+import discord4j.gateway.intent.Intent
+import discord4j.gateway.intent.IntentSet
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.server.application.*
@@ -40,17 +45,32 @@ fun Application.coreModule() {
     val playerManager = initLavaPlayer()
     val player = playerManager.createPlayer()
 
+    val discordClient: GatewayDiscordClient = DiscordClient
+        .create(appConfig.discordToken ?: throw RuntimeException("The discord bot should not have been initialized"))
+        .gateway()
+        .setEnabledIntents(
+            IntentSet.of(
+            Intent.DIRECT_MESSAGES,
+            Intent.GUILD_MESSAGES,
+            Intent.GUILDS,
+            Intent.GUILD_VOICE_STATES
+        ))
+        .login()
+        .block()
+        ?: throw RuntimeException("Failed to connect to Discord")
+
 
     // Koin dependency management
     val appModule = module {
         single { appConfig }
         single { playerManager }
+        single { RssManager }
         single { LavaPlayerAudioProvider(player) }
         single { TrackScheduler(player) }
         single { HttpClient(CIO) {
-
         }}
         single { scheduler }
+        single { discordClient }
     }
 
     startKoin {
@@ -68,7 +88,7 @@ fun Application.coreModule() {
         helloWorldApi()
     }
 
-    if (! appConfig.discordToken.isNullOrEmpty()) {
+    if (appConfig.discordToken.isNotEmpty()) {
         log.info("Initializing discord bot...")
         DiscordBot().init()
         log.info("Discord bot ready to go")

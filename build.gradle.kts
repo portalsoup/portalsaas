@@ -66,6 +66,8 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("org.json:json:20220924")
 
+    implementation("com.rometools:rome:2.1.0")
+
     // math processing
     implementation("com.notkamui.libs:keval:0.9.0")
 

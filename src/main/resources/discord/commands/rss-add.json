@@ -1,0 +1,15 @@
+{
+  "name": "rss-add",
+  "description": "Add an RSS subscription",
+  "options": [{
+    "name": "nickname",
+    "description": "Your unique name for this feed",
+    "type": 3,
+    "required": true
+  }, {
+    "name": "url",
+    "description": "The URL to the feed",
+    "type": 3,
+    "required": true
+  }]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "rss-delete",
+  "description": "Delete an RSS subscription",
+  "options": [{
+    "name": "nickname",
+    "description": "The unique name of the feed to delete.  This must be an exact match!",
+    "type": 3,
+    "required": true
+  }]
+}

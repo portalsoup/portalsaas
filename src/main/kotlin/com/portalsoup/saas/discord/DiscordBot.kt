@@ -3,10 +3,9 @@ package com.portalsoup.saas.discord
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
-import com.portalsoup.saas.discord.command.IDiscordCommand
 import com.portalsoup.saas.discord.command.DiceRollCommand
+import com.portalsoup.saas.discord.command.IDiscordCommand
 import com.portalsoup.saas.discord.command.MathCommand
-import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
 import com.portalsoup.saas.discord.command.PingPongCommand
 import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.AddFriendCodeCommand
@@ -14,16 +13,13 @@ import com.portalsoup.saas.discord.command.friendcode.LookupFriendCodeCommand
 import com.portalsoup.saas.discord.command.friendcode.RemoveFriendCodeCommand
 import com.portalsoup.saas.discord.command.pokedex.PokedexCommand
 import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
+import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
 import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
 import com.portalsoup.saas.manager.MtgManager
-import discord4j.core.DiscordClient
+import com.portalsoup.saas.manager.RssManager
 import discord4j.core.GatewayDiscordClient
-import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.message.MessageCreateEvent
-import discord4j.discordjson.json.ApplicationCommandRequest
-import discord4j.gateway.intent.Intent
-import discord4j.gateway.intent.IntentSet
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import reactor.core.publisher.Flux
@@ -36,21 +32,11 @@ class DiscordBot: KoinComponent, Logging {
 
     private val appConfig by inject<AppConfig>()
     private val mtgManager by inject<MtgManager>()
+    private val rssManager by inject<RssManager>()
 
     private val commands = hashMapOf<String, IDiscordCommand>()
 
-    private val client: GatewayDiscordClient = DiscordClient
-        .create(appConfig.discordToken ?: throw RuntimeException("The discord bot should not have been initialized"))
-        .gateway()
-        .setEnabledIntents(IntentSet.of(
-            Intent.DIRECT_MESSAGES,
-            Intent.GUILD_MESSAGES,
-            Intent.GUILDS,
-            Intent.GUILD_VOICE_STATES
-        ))
-        .login()
-        .block()
-        ?: throw RuntimeException("Failed to connect to Discord")
+    private val client by inject<GatewayDiscordClient>()
 
     /**
      * This is the bot entrypoint
@@ -77,19 +63,65 @@ class DiscordBot: KoinComponent, Logging {
             .subscribe()
     }
 
+
     private fun initGlobalCommands() {
         client.on(ChatInputInteractionEvent::class.java) { event ->
             event.takeIf { it.commandName == "greet" }?.reply("Hello")
         }.subscribe()
 
-        client.on(ApplicationCommandInteractionEvent::class.java) { event ->
-            event.reply()
+        client.on(ChatInputInteractionEvent::class.java) { event ->
             event.takeIf { it.commandName == "mtg" }?.reply("")
         }.subscribe()
+
+        client.on(ChatInputInteractionEvent::class.java) { event ->
+            event.takeIf { it.commandName == "rss-add" && event.interaction.guildId.isPresent }
+                ?.also {
+                    rssManager.addSubscription(
+                        event.interaction.guildId.get().asString(),
+                        event.interaction.user.id.asString(),
+                        getUrlFromEvent(it),
+                        getNicknameFromEvent(it)
+                    ) }
+                ?.reply("Got it, I'll let you know when this feed is updated.")
+                ?.withEphemeral(true)
+        }.subscribe()
+
+        client.on(ChatInputInteractionEvent::class.java) { event ->
+            event.takeIf { it.commandName == "rss-delete" }
+                ?.also { rssManager.removeSubscription(event.interaction.user.id.asString(), getNicknameFromEvent(it)) }
+                ?.reply("Subscription removed..")
+                ?.withEphemeral(true)
+        }.subscribe()
+
+        client.on(ChatInputInteractionEvent::class.java) { event ->
+            event.takeIf { it.commandName == "rss-list" }
+                ?.reply("Subscriptions:\n" + rssManager.listSubscriptions(event.interaction.user.id.asString()).joinToString("\n"))
+                ?.withEphemeral(true)
+        }.subscribe()
+
+    }
+
+    private fun getNicknameFromEvent(event: ChatInputInteractionEvent): String {
+        return event.getOption("nickname")
+            .flatMap { it.value }
+            .map { it.asString() }
+            .get()
+    }
+
+    private fun getUrlFromEvent(event: ChatInputInteractionEvent): String {
+        return event.getOption("url")
+            .flatMap { it.value }
+            .map { it.asString() }
+            .get()
     }
 
     private fun initGlobalCommandDefinitions() {
-        val commands = listOf("greet")
+        val commands = listOf(
+            "greet",
+            "rss-add",
+            "rss-delete",
+            "rss-list"
+        )
 
         runCatching {
             CommandReader(client.restClient).init(commands)
