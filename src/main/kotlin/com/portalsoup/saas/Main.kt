@@ -7,6 +7,7 @@ import com.portalsoup.saas.core.db.DatabaseFactory
 import com.portalsoup.saas.discord.DiscordBot
 import com.portalsoup.saas.discord.LavaPlayerAudioProvider
 import com.portalsoup.saas.discord.TrackScheduler
+import com.portalsoup.saas.manager.DiscordUserManager
 import com.portalsoup.saas.manager.RssManager
 import com.portalsoup.saas.quartz.QuartzModule
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
@@ -65,6 +66,7 @@ fun Application.coreModule() {
         single { appConfig }
         single { playerManager }
         single { RssManager }
+        single { DiscordUserManager() }
         single { LavaPlayerAudioProvider(player) }
         single { TrackScheduler(player) }
         single { HttpClient(CIO) {

@@ -15,6 +15,7 @@ import com.portalsoup.saas.discord.command.pokedex.PokedexCommand
 import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
 import com.portalsoup.saas.discord.command.youtube.JoinVoiceCommand
 import com.portalsoup.saas.discord.command.youtube.PlayYoutubeCommand
+import com.portalsoup.saas.manager.DiscordUserManager
 import com.portalsoup.saas.manager.MtgManager
 import com.portalsoup.saas.manager.RssManager
 import discord4j.core.GatewayDiscordClient
@@ -33,6 +34,7 @@ class DiscordBot: KoinComponent, Logging {
     private val appConfig by inject<AppConfig>()
     private val mtgManager by inject<MtgManager>()
     private val rssManager by inject<RssManager>()
+    private val discordUserManager by inject<DiscordUserManager>()
 
     private val commands = hashMapOf<String, IDiscordCommand>()
 
@@ -65,6 +67,22 @@ class DiscordBot: KoinComponent, Logging {
 
 
     private fun initGlobalCommands() {
+
+        client.on(ChatInputInteractionEvent::class.java) { event ->
+            event.interaction
+                .also { log().info("Found an interaction, does it have a guild id?") }
+                .takeIf { it.guildId.isPresent }
+                ?.also { log().info("Found an interaction with a guild id") }
+                ?.also { discordUserManager.addIfNewUser(event.interaction.user.id, it.guildId.get()) }
+
+            event.reply()
+        }.subscribe()
+
+        client.on(ChatInputInteractionEvent::class.java) { event ->
+            event.takeIf { it.commandName == "whoami" }?.let { discordUserManager.whoami(event) }
+        }.subscribe()
+
+
         client.on(ChatInputInteractionEvent::class.java) { event ->
             event.takeIf { it.commandName == "greet" }?.reply("Hello")
         }.subscribe()
@@ -72,32 +90,32 @@ class DiscordBot: KoinComponent, Logging {
         client.on(ChatInputInteractionEvent::class.java) { event ->
             event.takeIf { it.commandName == "mtg" }?.reply("")
         }.subscribe()
-
-        client.on(ChatInputInteractionEvent::class.java) { event ->
-            event.takeIf { it.commandName == "rss-add" && event.interaction.guildId.isPresent }
-                ?.also {
-                    rssManager.addSubscription(
-                        event.interaction.guildId.get().asString(),
-                        event.interaction.user.id.asString(),
-                        getUrlFromEvent(it),
-                        getNicknameFromEvent(it)
-                    ) }
-                ?.reply("Got it, I'll let you know when this feed is updated.")
-                ?.withEphemeral(true)
-        }.subscribe()
-
-        client.on(ChatInputInteractionEvent::class.java) { event ->
-            event.takeIf { it.commandName == "rss-delete" }
-                ?.also { rssManager.removeSubscription(event.interaction.user.id.asString(), getNicknameFromEvent(it)) }
-                ?.reply("Subscription removed..")
-                ?.withEphemeral(true)
-        }.subscribe()
-
-        client.on(ChatInputInteractionEvent::class.java) { event ->
-            event.takeIf { it.commandName == "rss-list" }
-                ?.reply("Subscriptions:\n" + rssManager.listSubscriptions(event.interaction.user.id.asString()).joinToString("\n"))
-                ?.withEphemeral(true)
-        }.subscribe()
+//
+//        client.on(ChatInputInteractionEvent::class.java) { event ->
+//            event.takeIf { it.commandName == "rss-add" && event.interaction.guildId.isPresent }
+//                ?.also {
+//                    rssManager.addSubscription(
+//                        event.interaction.guildId.get().asString(),
+//                        event.interaction.user.id.asString(),
+//                        getUrlFromEvent(it),
+//                        getNicknameFromEvent(it)
+//                    ) }
+//                ?.reply("Got it, I'll let you know when this feed is updated.")
+//                ?.withEphemeral(true)
+//        }.subscribe()
+//
+//        client.on(ChatInputInteractionEvent::class.java) { event ->
+//            event.takeIf { it.commandName == "rss-delete" }
+//                ?.also { rssManager.removeSubscription(event.interaction.user.id.asString(), getNicknameFromEvent(it)) }
+//                ?.reply("Subscription removed..")
+//                ?.withEphemeral(true)
+//        }.subscribe()
+//
+//        client.on(ChatInputInteractionEvent::class.java) { event ->
+//            event.takeIf { it.commandName == "rss-list" }
+//                ?.reply("Subscriptions:\n" + rssManager.listSubscriptions(event.interaction.user.id.asString()).joinToString("\n"))
+//                ?.withEphemeral(true)
+//        }.subscribe()
 
     }
 
@@ -120,7 +138,8 @@ class DiscordBot: KoinComponent, Logging {
             "greet",
             "rss-add",
             "rss-delete",
-            "rss-list"
+            "rss-list",
+            "whoami"
         )
 
         runCatching {
