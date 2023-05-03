@@ -6,12 +6,13 @@ import com.portalsoup.saas.data.tables.DiscordUser
 import com.portalsoup.saas.data.tables.DiscordUserTable
 import discord4j.common.util.Snowflake
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.spec.EmbedCreateSpec
-import discord4j.core.spec.InteractionApplicationCommandCallbackReplyMono
+import discord4j.core.`object`.entity.Message
+import discord4j.core.spec.InteractionReplyEditSpec
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
+import org.reactivestreams.Publisher
 import java.time.LocalDate
 
 class DiscordUserManager: KoinComponent, Logging {
@@ -45,17 +46,21 @@ class DiscordUserManager: KoinComponent, Logging {
         }
     }
 
-    fun whoami(event: ChatInputInteractionEvent): InteractionApplicationCommandCallbackReplyMono? {
+    fun whoami(event: ChatInputInteractionEvent): Publisher<Message>? {
         val user = lookupUser(event.interaction.user.id)
+        event.deferReply().withEphemeral(true)
 
         return if (user != null) {
-            event.reply()
-                .withEphemeral(true)
-                .withEmbeds(EmbedCreateSpec.builder()
-                    .title(user.snowflake)
-                    .addField("Nickname?", user.takeIf { it.nickname != null }?.let { "Yes" } ?: "No", true)
-                    .addField("DM Snowflake", user.dmGuildId, true)
-                    .build())
-        } else event.reply().withEphemeral(true)
+
+            return event.editReply(
+                InteractionReplyEditSpec.builder()
+                    .build()
+                    .withContentOrNull("You are ${user.snowflake}")
+            )
+        } else event.editReply(
+            InteractionReplyEditSpec.builder()
+                .build()
+                .withContentOrNull("I don't know who you are")
+        )
     }
 }

@@ -79,7 +79,7 @@ class DiscordBot: KoinComponent, Logging {
         }.subscribe()
 
         client.on(ChatInputInteractionEvent::class.java) { event ->
-            event.takeIf { it.commandName == "whoami" }?.let { discordUserManager.whoami(event) }
+            event.takeIf { it.commandName == "whoami" }?.let(discordUserManager::whoami)
         }.subscribe()
 
 
