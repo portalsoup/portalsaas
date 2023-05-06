@@ -78,9 +78,9 @@ class DiscordBot: KoinComponent, Logging {
             event.reply()
         }.subscribe()
 
-        client.on(ChatInputInteractionEvent::class.java) { event ->
-            event.takeIf { it.commandName == "whoami" }?.let(discordUserManager::whoami)
-        }.subscribe()
+//        client.on(ChatInputInteractionEvent::class.java) { event ->
+//            event.takeIf { it.commandName == "whoami" }?.let(discordUserManager::whoami)
+//        }.subscribe()
 
 
         client.on(ChatInputInteractionEvent::class.java) { event ->
@@ -136,10 +136,10 @@ class DiscordBot: KoinComponent, Logging {
     private fun initGlobalCommandDefinitions() {
         val commands = listOf(
             "greet",
-            "rss-add",
-            "rss-delete",
-            "rss-list",
-            "whoami"
+//            "rss-add",
+//            "rss-delete",
+//            "rss-list",
+//            "whoami"
         )
 
         runCatching {

@@ -6,8 +6,7 @@ import com.portalsoup.saas.discord.DiscordBot
 import io.ktor.server.application.*
 
 //val foo by lazy { KoinPlatformTools.defaultContext().get().get<AppConfig>() }
-fun Application.discord() {
-    val appConfig = AppConfig.default(environment)
+fun Application.discord(appConfig: AppConfig) {
 
     if (appConfig.discordToken?.isNotEmpty() == true) {
         DiscordClientBuilder.build(appConfig)

@@ -5,7 +5,6 @@ import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
-import org.koin.dsl.module
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
@@ -20,10 +19,15 @@ object KoinMain: Logging {
 
     fun getModules(appConfig: AppConfig): List<Module> {
         return KoinModules::class.sealedSubclasses
+            .asSequence()
             .onEach(::validateModuleSignature)
             .onEach { log().info("About to initialize the Koin module: ${it.simpleName}") }
             .mapNotNull { it.primaryConstructor }
-            .map { module { it.call(appConfig)} }
+            .onEach { log().info("Initialized.") }
+            .map { it.call(appConfig) }
+            .filter { it.shouldInitialize() }
+            .map { it.initialize() }
+            .toList()
     }
 
     private fun validateModuleSignature(module: KClass<out KoinModules>) {

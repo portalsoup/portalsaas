@@ -13,6 +13,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 fun Routing.helloWorldApi() {
+
+    println("HELLO WORLD API")
+
     get("/hello") {
         val helloer: String = call.parameters["name"] ?: "Anonymous"
 

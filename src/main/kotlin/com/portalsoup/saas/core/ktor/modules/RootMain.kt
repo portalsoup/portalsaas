@@ -16,4 +16,7 @@ fun Application.root() {
 
     KoinMain.init(appConfig)
 
+    // Initialize other modules here
+    discord(appConfig)
+    api()
 }

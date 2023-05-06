@@ -8,6 +8,7 @@ import com.portalsoup.saas.manager.*
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
+import discord4j.core.GatewayDiscordClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import org.koin.core.module.Module
@@ -46,8 +47,11 @@ sealed interface KoinModules {
 
     data class DiscordModule(val appConfig: AppConfig): KoinModules {
         override fun shouldInitialize() = appConfig.discordToken.isNullOrEmpty().not()
-        override fun initialize(): Module = module {
-            single { DiscordClientBuilder.build(appConfig) }
+        override fun initialize(): Module {
+            val client: GatewayDiscordClient = DiscordClientBuilder.build(appConfig)
+            return module {
+                single<GatewayDiscordClient> { client }
+            }
         }
     }
 
