@@ -69,7 +69,7 @@ application {
 
 tasks {
     named<ShadowJar>("shadowJar") {
-
+        mustRunAfter("client:package")
         archiveBaseName.set("shadow")
         archiveVersion.set("")
         archiveClassifier.set("")
@@ -78,18 +78,20 @@ tasks {
             attributes(mapOf("Main-Class" to "com.portalsoup.saas.MainKt"))
         }
     }
-}
 
-tasks {
     test {
         useJUnitPlatform()
     }
 
-    build {
+    register("deploy") {
         dependsOn(shadowJar)
     }
 
-    register("deploy") {
+    clean {
+        delete(rootDir.resolve("src/main/resources/static"))
+    }
+
+    build {
         dependsOn(shadowJar)
     }
 }

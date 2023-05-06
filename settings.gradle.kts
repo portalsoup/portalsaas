@@ -9,4 +9,4 @@ pluginManagement {
 
 rootProject.name = "portalsaas"
 
-include("deploy")
+include("deploy", "client")

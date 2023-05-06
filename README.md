@@ -18,6 +18,12 @@ and be a stable place to deploy personally useful code.
   * Terraform
   * Ansible
   * DigitalOcean
+* Javascript
+  * React
+  * ES6
+  * Redux
+  * Babel
+  * Webpack
 
 
 # System requirements
@@ -46,6 +52,8 @@ The `gradle.properties` file contains app secrets and so isn't checked into the 
 `doToken` and `doSshId` are both required DigitalOcean properties only if the app is to be deployed to a production server.
 
 # Run locally
+
+## Server
 To run the app locally, run these commands:
 
     ./gradlew ktor-config shadowJar
@@ -58,9 +66,18 @@ fully bundled in a single jar.
 
 My typical developer flow is:
 
-    docker-compose up -d db   # start the database in detached mode
+    docker-compose down && ./gradlew ktor-config shadowJar && docker-compose up
 
-    ./gradlew shadowJar && docker-compose run --rm app    # ctrl+c then re-run to rebuild
+## Client
+The client is served from the resources/static folder.  To build the client, cd into the `client` directory and
+run
+
+    npm i
+    npm run build
+
+Then invoke the gradle command:
+
+    ./gradlew package
 
 # Deploy
 
