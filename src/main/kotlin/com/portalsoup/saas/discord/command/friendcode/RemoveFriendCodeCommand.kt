@@ -3,6 +3,7 @@ package com.portalsoup.saas.discord.command.friendcode
 import com.portalsoup.saas.data.tables.FriendCodeTable
 import com.portalsoup.saas.discord.command.IDiscordCommand
 import discord4j.core.event.domain.message.MessageCreateEvent
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction

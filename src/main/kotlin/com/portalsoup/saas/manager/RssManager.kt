@@ -12,7 +12,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.time.LocalDate
 
-object RssManager: Logging, KoinComponent {
+class RssManager: Logging, KoinComponent {
 
     private val httpClient by inject<HttpClient>()
     private val discordClient by inject<GatewayDiscordClient>()

@@ -4,7 +4,9 @@ ktor {
     }
     application {
         modules = [
-            com.portalsoup.saas.MainKt.coreModule
+            com.portalsoup.saas.core.ktor.modules.RootMainKt.root,
+            com.portalsoup.saas.core.ktor.modules.DiscordMainKt.discord,
+            com.portalsoup.saas.core.ktor.modules.ApiMainKt.api
         ]
     }
 }

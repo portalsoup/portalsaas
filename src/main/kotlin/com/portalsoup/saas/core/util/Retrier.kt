@@ -1,4 +1,4 @@
-package com.portalsoup.saas.core
+package com.portalsoup.saas.core.util
 
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log

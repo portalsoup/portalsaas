@@ -3,7 +3,7 @@ package com.portalsoup.saas.manager
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
-import com.portalsoup.saas.core.measureDuration
+import com.portalsoup.saas.core.util.measureDuration
 import com.portalsoup.saas.data.tables.pricecharting.VideoGame
 import com.portalsoup.saas.data.tables.pricecharting.VideoGamePriceTable
 import com.portalsoup.saas.data.tables.pricecharting.VideoGameTable

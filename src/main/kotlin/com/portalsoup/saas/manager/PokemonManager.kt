@@ -1,8 +1,8 @@
 package com.portalsoup.saas.manager
 
-import com.portalsoup.saas.core.Api
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
+import com.portalsoup.saas.core.web.Api
 import com.portalsoup.saas.dto.pokedex.Ability
 import com.portalsoup.saas.dto.pokedex.Pokemon
 import com.portalsoup.saas.dto.pokedex.PokemonHandle
@@ -16,9 +16,10 @@ import kotlinx.serialization.json.Json
 /**
  * Collect functionality to interact with pokeapi's API
  */
-object PokemonManager: Logging {
-
-    private const val host = "https://pokeapi.co/api/v2/"
+class PokemonManager: Logging {
+    companion object {
+        private const val host = "https://pokeapi.co/api/v2/"
+    }
 
     @OptIn(ExperimentalSerializationApi::class)
     private val json = Json {
@@ -121,7 +122,7 @@ object PokemonManager: Logging {
     private fun pokemonEndpoint(name: String): Pokemon? {
         log().info("Found the name [$name]")
         val response = runBlocking {
-            runCatching { Api.makeRequest("${host}/pokemon/$name") }.getOrNull()
+            runCatching { Api.makeRequest("${Companion.host}/pokemon/$name") }.getOrNull()
         }
         val pokemon = response?.let { json.decodeFromString<Pokemon>(response) }
         return pokemon?.copy(
@@ -141,7 +142,7 @@ object PokemonManager: Logging {
      */
     private fun pokemonSpeciesEndpoint(name: String): PokemonSpecies? {
         val response = runBlocking {
-            runCatching { Api.makeRequest("${host}/pokemon-species/$name") }.getOrNull()
+            runCatching { Api.makeRequest("${Companion.host}/pokemon-species/$name") }.getOrNull()
         }
         val species = response?.let { json.decodeFromString<PokemonSpecies>(response) }
         return species?.copy(
@@ -158,7 +159,7 @@ object PokemonManager: Logging {
      * @return The found Ability or null
      */
     private fun pokemonAbilityEndpoint(url: String): Ability? {
-        val response = runBlocking { runCatching {Api.makeRequest(url) }.getOrNull() }
+        val response = runBlocking { runCatching { Api.makeRequest(url) }.getOrNull() }
         val ability = response?.let { json.decodeFromString<Ability>(response) }
         return ability?.copy(
             effectEntries = listOf(

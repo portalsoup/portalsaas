@@ -1,23 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-object Versions {
-    const val jpx = "1.4.0"
-    const val exposed = "0.36.2"
-    const val hikari = "2.7.8"
-    const val flyway = "9.8.2"
-    const val ktor = "2.1.3"
-    const val psql = "42.5.0"
-    const val h2 = "1.4.200"
-    const val kotlinReflect = "1.2.51"
-    const val slf4j = "1.7.30"
-    const val logback = "1.2.3"
-
-    // testing
-    const val junit = "4.12"
-    const val testng = "7.3.0"
-    const val hamkrest = "1.7.0.3"
-}
-
 plugins {
     kotlin("jvm") version "1.7.21"
     application
@@ -37,31 +19,33 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core:${Versions.ktor}")
-    implementation("io.ktor:ktor-server-netty-jvm:${Versions.ktor}")
-    implementation("io.ktor:ktor-client-core:${Versions.ktor}")
-    implementation("io.ktor:ktor-client-cio:${Versions.ktor}")
-    implementation("io.ktor:ktor-network-tls-certificates:${Versions.ktor}")
-
-    implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
-
-    implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktor}")
+    implementation("io.ktor:ktor-server-core:2.3.0")
+    implementation("io.ktor:ktor-server-netty-jvm:2.3.0")
+    implementation("io.ktor:ktor-client-core:2.3.0")
+    implementation("io.ktor:ktor-client-cio:2.3.0")
+    implementation("io.ktor:ktor-network-tls-certificates:2.3.0")
+    implementation("io.ktor:ktor-server-cors:2.3.0")
+    implementation("io.ktor:ktor-auth-jwt:1.6.8")
+    implementation("io.ktor:ktor-gson:1.6.8")
+    implementation("io.ktor:ktor-server-sessions:2.3.0")
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.0")
+    implementation("io.ktor:ktor-serialization-gson:2.3.0")
 
     implementation("org.quartz-scheduler:quartz:2.3.2")
 
-    implementation("io.jenetics:jpx:${Versions.jpx}")
-    implementation("com.zaxxer:HikariCP:${Versions.hikari}")
-    implementation("org.flywaydb:flyway-core:${Versions.flyway}")
+    implementation("io.jenetics:jpx:3.0.1")
+    implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("org.flywaydb:flyway-core:9.17.0")
 
-    implementation("org.postgresql:postgresql:${Versions.psql}")
-    implementation("org.jetbrains.exposed:exposed-core:${Versions.exposed}")
-    implementation("org.jetbrains.exposed:exposed-dao:${Versions.exposed}")
-    implementation("org.jetbrains.exposed:exposed-java-time:${Versions.exposed}")
-    implementation("org.jetbrains.exposed:exposed-jdbc:${Versions.exposed}")
+    implementation("org.postgresql:postgresql:42.6.0")
+    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
 
-    implementation("io.insert-koin:koin-core:3.3.2")
+    implementation("io.insert-koin:koin-core:3.4.0")
 
-    implementation("io.jenetics:jpx:${Versions.jpx}")
+    implementation("io.jenetics:jpx:3.0.1")
     implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("org.json:json:20220924")
@@ -72,7 +56,7 @@ dependencies {
     implementation("com.notkamui.libs:keval:0.9.0")
 
     // Discord deps
-    implementation("com.discord4j:discord4j-core:3.2.3")
+    implementation("com.discord4j:discord4j-core:3.3.0-M1")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
 
     testImplementation(kotlin("test"))

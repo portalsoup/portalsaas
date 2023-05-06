@@ -1,4 +1,4 @@
-package com.portalsoup.saas.core
+package com.portalsoup.saas.core.util
 
 import java.time.Duration
 
