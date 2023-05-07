@@ -1,5 +1,6 @@
+@import "globals/theme";
+
 body {
-  background: linear-gradient(253deg, #0cc898, #1797d2, #864fe1);
   background-size: 300% 300%;
   -webkit-animation: Background 25s ease infinite;
   -moz-animation: Background 25s ease infinite;
@@ -7,7 +8,10 @@ body {
 }
 
 .full-screen {
+  background: $primary;
   position: fixed;
+  display: flex;
+  justify-content: center;
   top: 0;
   right: 0;
   bottom: 0;
@@ -15,5 +19,5 @@ body {
 }
 
 h1 {
-  color: #569525;
+  color: $complement1;
 }

@@ -32,15 +32,21 @@ val terraformDir = "$rootDir/infrastructure/terraform/"
 val pathToAnsibleInventory = "$ansibleDir/inventory/"
 val pathToResources = "$rootDir/src/main/resources/"
 
-tasks {
-    rootProject.tasks.getByName("compileKotlin") {
+rootProject.tasks {
+    getByName("processResources") {
+        dependsOn("deploy:ktor-config")
+    }
+
+    getByName("compileKotlin") {
         mustRunAfter("deploy:ktor-config")
     }
 
-    rootProject.tasks.getByName("build") {
-        dependsOn(":deploy:ktor-config")
+    getByName("build") {
+        dependsOn("deploy:ktor-config")
     }
+}
 
+tasks {
     register<Delete>("clean") {
         delete(
             "\"$ansibleDir/inventory\"",

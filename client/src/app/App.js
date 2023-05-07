@@ -1,29 +1,41 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Counter } from "./features/counter/Counter"
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 import store from './store'
+import {createBrowserRouter, createRoutesFromElements, Outlet, Route, RouterProvider} from "react-router-dom";
+import {Counter} from "./components/counter/Counter";
+import {Home} from "./components/home/Home";
+import {About} from "./components/about/About";
+import {Navbar} from "./components/nav/Navbar";
+import "./App.scss"
 
+export const App = () => {
+    const router = createBrowserRouter(
+        createRoutesFromElements(
+            <Route path="/" element={<Root/>}>
+                <Route index element={<Home/>}/>
+                <Route path="/counter" element={<Counter/>}/>
+                <Route path="/about" element={<About/>}/>
+            </Route>
+        )
+    )
 
-export default function App() {
     return (
         <Provider store={store}>
             <div className="full-screen">
-                <div>
-                    <h1>
-                        Portalsaas
-                    </h1>
-                    <br/>
-                    <a
-                        className="button-line"
-                        href="https://github.com/portalsoup"
-                        target="_blank"
-                    >
-                        Github
-                    </a>
-                </div>
-                <Counter />
+                <RouterProvider router={router}/>
             </div>
         </Provider>
     )
+}
+
+const Root = () => {
+    return <>
+        <div>
+            This is the navbar
+            <Navbar/>
+        </div>
+        <div>
+            <Outlet></Outlet>
+        </div>
+    </>
 }

@@ -88,10 +88,14 @@ tasks {
     }
 
     clean {
-        delete(rootDir.resolve("src/main/resources/static"))
+        dependsOn("deleteStaticAssets")
     }
 
     build {
         dependsOn(shadowJar)
+    }
+
+    create<Delete>("deleteStaticAssets") {
+        delete(projectDir.resolve("src/main/resources/static"))
     }
 }
