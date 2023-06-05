@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 
 services:
   app:
@@ -34,6 +34,13 @@ services:
     restart: always
     networks:
       - server
+  client:
+    image: httpd:latest
+    ports:
+      - '80:80'
+    volumes:
+      - ./client/build:/usr/local/apache2/htdocs
+
 networks:
   server:
   client:

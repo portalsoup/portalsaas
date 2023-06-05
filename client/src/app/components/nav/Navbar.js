@@ -12,6 +12,12 @@ export const Navbar = () => {
                 <li>
                     <Link to="/counter">Counter</Link>
                 </li>
+                <li>
+                    <Link to="/about">About</Link>
+                </li>
+                <li>
+                    <Link to="/map">Map</Link>
+                </li>
             </ul> 
         </nav>
     )

@@ -15,6 +15,7 @@ export const App = () => {
                 <Route index element={<Home/>}/>
                 <Route path="/counter" element={<Counter/>}/>
                 <Route path="/about" element={<About/>}/>
+                <Route path="/map" element={<About/>}/>
             </Route>
         )
     )
@@ -29,13 +30,12 @@ export const App = () => {
 }
 
 const Root = () => {
-    return <>
+    return <div>
         <div>
-            This is the navbar
             <Navbar/>
         </div>
         <div>
             <Outlet></Outlet>
         </div>
-    </>
+    </div>
 }
