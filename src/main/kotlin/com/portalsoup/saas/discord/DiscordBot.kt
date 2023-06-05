@@ -1,6 +1,7 @@
 package com.portalsoup.saas.discord
 
 import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.core.discord.DiscordChatGPT
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.discord.command.DiceRollCommand
@@ -52,6 +53,17 @@ class DiscordBot: KoinComponent, Logging {
 
         client.eventDispatcher.on(MessageCreateEvent::class.java)
             .flatMap { event ->
+                val foundId = event.message.author.orElseGet(null)?.id?.asString()
+                val prompt = event.message.content
+
+                Mono.just(event.message)
+                    .filter { !it.content.startsWith(COMMAND_PREFIX) }
+                    .filter { it.author.orElseGet(null)?.id?.asString() == appConfig.myDiscordID }
+                    .map { message -> message.channel.flatMap { it.createMessage(DiscordChatGPT.gpt(prompt)) } }
+            }.subscribe()
+
+        client.eventDispatcher.on(MessageCreateEvent::class.java)
+            .flatMap { event ->
                 Mono.just(event.message.content)
                     .flatMap { content ->
                         Flux.fromIterable(commands.entries)
@@ -87,9 +99,6 @@ class DiscordBot: KoinComponent, Logging {
             event.takeIf { it.commandName == "greet" }?.reply("Hello")
         }.subscribe()
 
-        client.on(ChatInputInteractionEvent::class.java) { event ->
-            event.takeIf { it.commandName == "mtg" }?.reply("")
-        }.subscribe()
 //
 //        client.on(ChatInputInteractionEvent::class.java) { event ->
 //            event.takeIf { it.commandName == "rss-add" && event.interaction.guildId.isPresent }
@@ -164,6 +173,7 @@ class DiscordBot: KoinComponent, Logging {
         commands["pokedex"] = PokedexCommand
         commands["vg"] = VideoGameLookupCommand
         commands["roll"] = DiceRollCommand
+//        commands[""] = ChatGPTCommand
     }
 
     companion object {

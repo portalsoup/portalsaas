@@ -58,6 +58,7 @@ dependencies {
     // Discord deps
     implementation("com.discord4j:discord4j-core:3.3.0-M1")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
+    implementation("com.cjcrafter:openai:1.3.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
@@ -89,6 +90,7 @@ tasks {
 
     clean {
         dependsOn("deleteStaticAssets")
+        delete(projectDir.resolve("src/main/resources/application.conf"))
     }
 
     build {

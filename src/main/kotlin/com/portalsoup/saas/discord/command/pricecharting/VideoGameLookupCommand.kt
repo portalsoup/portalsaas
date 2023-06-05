@@ -53,7 +53,7 @@ object VideoGameLookupCommand: IDiscordCommand, Logging {
             .map { grouped -> FoundVideoGame(grouped.key, grouped.value.associate { it.console to it.price }) }
             .let { Flux.fromIterable(it) } // It is now a Flux
             .take(discordResultLimit)
-            .map(::formatGameString)
+            .map(VideoGameLookupCommand::formatGameString)
             .collect(Collectors.joining("\n"))
             .flatMap { msg ->  event.message.channel.flatMap {
                 val msgPrefix = msg.takeUnless { m -> m.isEmpty() }?.let { "I found a few possible matches with loose prices:" } ?: "I didn't find any games that match"
