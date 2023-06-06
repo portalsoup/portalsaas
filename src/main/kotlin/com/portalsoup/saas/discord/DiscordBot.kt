@@ -1,6 +1,7 @@
 package com.portalsoup.saas.discord
 
 import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
 import net.dv8tion.jda.api.JDA
 import org.koin.core.component.KoinComponent
@@ -19,10 +20,12 @@ class DiscordBot: KoinComponent, Logging {
     fun init() {
         client.updateCommands()
             .addCommands(
-            MathCommand.commandData
+                MathCommand.commandData,
+                DiceRollCommand.commandData
         ).queue()
 
         client.addEventListener(MathCommand)
+        client.addEventListener(DiceRollCommand)
 
     }
 }
