@@ -28,7 +28,7 @@ object DiceRollCommand: IDiscordGlobalCommand() {
 //            event.hook.sendMessage("").queue()
 
             EmbedBuilder()
-                .setTitle("Results from dice throw${quantity.takeIf { it > 1 }?.let { "s" } ?: ""}...")
+                .setTitle("Results from dice throw${quantity.takeIf { it > 1 }?.let { "s" } ?: ""}")
                 .setDescription(buildTitle(event.user.name, quantity, sides))
                 .also {
                     for (i in 1..quantity) {
