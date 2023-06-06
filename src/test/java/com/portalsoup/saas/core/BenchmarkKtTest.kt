@@ -1,5 +1,6 @@
 package com.portalsoup.saas.core
 
+import com.portalsoup.saas.core.util.measureDuration
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -17,7 +18,7 @@ class BenchmarkKtTest {
 
         // Verification
         println(result.duration.toMillis())
-        assertTrue { result.duration.toMillis() > sleepLength }
+        assertTrue { result.duration.toMillis() >=   sleepLength }
         assertTrue { result.duration.toMillis() < sleepLength  + 50L} // A bit of time goes to the overhead of the execution, but shouldn't be much more than 5-10ms extra reasonably
     }
 

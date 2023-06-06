@@ -2,15 +2,13 @@ package com.portalsoup.saas.core.koin
 
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.discord.DiscordClientBuilder
-import com.portalsoup.saas.discord.LavaPlayerAudioProvider
-import com.portalsoup.saas.discord.TrackScheduler
-import com.portalsoup.saas.manager.*
+import com.portalsoup.saas.manager.PriceChartingManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
-import discord4j.core.GatewayDiscordClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import net.dv8tion.jda.api.JDA
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.quartz.impl.StdSchedulerFactory
@@ -48,9 +46,9 @@ sealed interface KoinModules {
     data class DiscordModule(val appConfig: AppConfig): KoinModules {
         override fun shouldInitialize() = appConfig.discordToken.isNullOrEmpty().not()
         override fun initialize(): Module {
-            val client: GatewayDiscordClient = DiscordClientBuilder.build(appConfig)
+            val client: JDA = DiscordClientBuilder.build(appConfig)
             return module {
-                single<GatewayDiscordClient> { client }
+                single<JDA> { client }
             }
         }
     }
@@ -63,8 +61,8 @@ sealed interface KoinModules {
             val player = playerManager.createPlayer()
 
             return module {
-                single { LavaPlayerAudioProvider(player) }
-                single { TrackScheduler(player) }
+//                single { LavaPlayerAudioProvider(player) }
+//                single { TrackScheduler(player) }
             }
         }
 
@@ -83,10 +81,6 @@ sealed interface KoinModules {
         override fun shouldInitialize(): Boolean = true
 
         override fun initialize(): Module = module {
-            single { RssManager() }
-            single { DiscordUserManager() }
-            single { MtgManager() }
-            single { PokemonManager() }
             single { PriceChartingManager() }
         }
 

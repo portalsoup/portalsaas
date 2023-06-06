@@ -1,6 +1,10 @@
 package com.portalsoup.saas.core
 
-import org.junit.jupiter.api.Assertions.*
+import com.portalsoup.saas.core.util.Retrier
+import com.portalsoup.saas.core.util.RetryConfig
+import com.portalsoup.saas.core.util.RetryException
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class RetrierTest {
@@ -16,7 +20,7 @@ class RetrierTest {
         assertThrows(RetryException::class.java) {
             Retrier(
                 name = "failTest",
-                config = RetryConfig(maxTries = 2),
+                config = RetryConfig(maxTries = 2, 0, { 0 }),
                 lambda = f
             )
         }
@@ -39,7 +43,7 @@ class RetrierTest {
         // Execution
         val result = Retrier(
             name = "failTest",
-            config = RetryConfig(maxTries = 2),
+            config = RetryConfig(maxTries = 2, 0, { 0 }),
             lambda = f
         )
 
