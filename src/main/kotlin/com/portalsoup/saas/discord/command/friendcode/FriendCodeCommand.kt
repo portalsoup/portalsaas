@@ -27,7 +27,7 @@ object FriendCodeCommand: KoinComponent, IDiscordGlobalCommand() {
     override val commandData: CommandData = Commands.slash("friendcode", "manage your switch friend code.")
         .addOption(OptionType.MENTIONABLE, "user", "The user whose code to look up.")
         .addOption(OptionType.BOOLEAN, "remove", "Remove your own Friend Code from the database.")
-        .addOption(OptionType.STRING, "add  ", "Add your Friend Code to the database if it doesn't already exist.")
+        .addOption(OptionType.STRING, "add", "Add your Friend Code to the database if it doesn't already exist.")
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (isMatch(event)) {
