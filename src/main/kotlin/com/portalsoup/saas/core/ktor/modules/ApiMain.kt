@@ -20,7 +20,9 @@ fun Application.api() {
         // Configure client
         staticResources("/", "static", "index.html")
 
-        healthcheckApi()
-        helloWorldApi()
+        route("/api") {
+            this@install.healthcheckApi()
+            this@install.helloWorldApi()
+        }
     }
 }

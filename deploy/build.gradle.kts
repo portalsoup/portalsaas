@@ -19,12 +19,14 @@ repositories {
     mavenCentral()
 }
 
-// Variables required from gradle.properties
+// Properties loaded from gradle.properties
 val priceChartingKey: String by project
 val doToken: String? by project
 val doSshId: String? by project
 val discordToken: String? by project
+val myDiscordID: String by project
 val pricechartingToken: String? by project
+val openaiToken: String? by project
 
 // Shortcuts
 val ansibleDir = "$rootDir/infrastructure/ansible/"
@@ -32,15 +34,21 @@ val terraformDir = "$rootDir/infrastructure/terraform/"
 val pathToAnsibleInventory = "$ansibleDir/inventory/"
 val pathToResources = "$rootDir/src/main/resources/"
 
-tasks {
-    rootProject.tasks.getByName("compileKotlin") {
+rootProject.tasks {
+    getByName("processResources") {
+        dependsOn("deploy:ktor-config")
+    }
+
+    getByName("compileKotlin") {
         mustRunAfter("deploy:ktor-config")
     }
 
-    rootProject.tasks.getByName("build") {
-        dependsOn(":deploy:ktor-config")
+    getByName("build") {
+        dependsOn("deploy:ktor-config")
     }
+}
 
+tasks {
     register<Delete>("clean") {
         delete(
             "\"$ansibleDir/inventory\"",
@@ -304,7 +312,9 @@ tasks.register("ktor-config") {
             "password" to password,
             "maxPool" to "10",
             "discordToken" to discordToken,
-            "pricechartingToken" to pricechartingToken
+            "pricechartingToken" to pricechartingToken,
+            "openaiToken" to openaiToken,
+            "myDiscordID" to myDiscordID
         ))
 
         if (dest.exists() && !dest.delete()) {

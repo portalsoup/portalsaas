@@ -1,14 +1,7 @@
-version: '3.7'
-
-x-jdbc-config: &db-config
-  JDBC_URL: "jdbc:postgresql://db:5432/app"
-  JDBC_DRIVER: "org.postgresql.Driver"
-  JDBC_USERNAME: "postgres"
-  JDBC_PASSWORD: "tour"
-  JDBC_MAX_POOL: "10"
+version: '3.9'
 
 services:
-  app: &app
+  app:
     build:
       context: .
       dockerfile: docker/Dockerfile.server
@@ -42,13 +35,12 @@ services:
     networks:
       - server
   client:
-    image: httpd:2.4-alpine
+    image: httpd:latest
     ports:
-      - "80:80"
+      - '80:80'
     volumes:
-      - "./client/build:/usr/local/apache2/htdocs/"
-    networks:
-      - client
+      - ./client/build:/usr/local/apache2/htdocs
+
 networks:
   server:
   client:

@@ -1,0 +1,9 @@
+{
+  "name": "gpt",
+  "description": "Ask GPT a question",
+  "options": [{
+    "name": "query",
+    "type": 3,
+    "required": true
+  }]
+}

@@ -56,11 +56,13 @@ dependencies {
     implementation("com.notkamui.libs:keval:0.9.0")
 
     // Discord deps
-    implementation("com.discord4j:discord4j-core:3.3.0-M1")
+// https://mvnrepository.com/artifact/net.dv8tion/JDA
+    implementation("net.dv8tion:JDA:5.0.0-beta.10")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
+    implementation("com.cjcrafter:openai:1.3.0")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0-M1")
 }
 
 application {
@@ -88,10 +90,15 @@ tasks {
     }
 
     clean {
-        delete(rootDir.resolve("src/main/resources/static"))
+        dependsOn("deleteStaticAssets")
+        delete(projectDir.resolve("src/main/resources/application.conf"))
     }
 
     build {
         dependsOn(shadowJar)
+    }
+
+    create<Delete>("deleteStaticAssets") {
+        delete(projectDir.resolve("src/main/resources/static"))
     }
 }

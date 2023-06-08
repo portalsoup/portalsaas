@@ -11,3 +11,4 @@ gradle.properties
 **/inventory
 **/node_modules
 **/bundle.js
+**/resources/**/static/**/*

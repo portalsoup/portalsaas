@@ -1,25 +1,11 @@
 package com.portalsoup.saas.core.discord
 
 import com.portalsoup.saas.config.AppConfig
-import discord4j.core.DiscordClient
-import discord4j.core.GatewayDiscordClient
-import discord4j.gateway.intent.Intent
-import discord4j.gateway.intent.IntentSet
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.JDABuilder
 
 object DiscordClientBuilder {
 
-    fun build(appConfig: AppConfig): GatewayDiscordClient = DiscordClient
-        .create(appConfig.discordToken ?: throw RuntimeException("The discord bot should not have been initialized"))
-        .gateway()
-        .setEnabledIntents(
-            IntentSet.of(
-                Intent.DIRECT_MESSAGES,
-                Intent.GUILD_MESSAGES,
-                Intent.GUILDS,
-                Intent.GUILD_VOICE_STATES
-            ))
-        .login()
-        .block()
-        ?: throw RuntimeException("Failed to connect to Discord")
+    fun build(appConfig: AppConfig): JDA = JDABuilder.createDefault(appConfig.discordToken).build()
 
 }

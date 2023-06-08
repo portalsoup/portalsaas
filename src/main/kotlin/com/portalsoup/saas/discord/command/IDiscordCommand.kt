@@ -1,15 +1,19 @@
 package com.portalsoup.saas.discord.command
 
 import com.portalsoup.saas.core.extensions.Logging
-import com.portalsoup.saas.core.extensions.log
-import discord4j.core.event.domain.message.MessageCreateEvent
-import reactor.core.publisher.Mono
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.build.CommandData
 
-interface IDiscordCommand: Logging {
-    fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void>
+abstract class IDiscordCommand: Logging, ListenerAdapter() {
 
-    fun fail(reason: String): Mono<Void> {
-        log().info(reason)
-        return Mono.empty()
+}
+
+abstract class IDiscordGlobalCommand: IDiscordCommand() {
+
+    abstract val commandData: CommandData
+
+    fun isMatch(event: SlashCommandInteractionEvent): Boolean {
+        return event.name == commandData.name
     }
 }

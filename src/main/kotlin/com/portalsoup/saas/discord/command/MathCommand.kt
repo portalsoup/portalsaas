@@ -1,8 +1,10 @@
 package com.portalsoup.saas.discord.command
 
 import com.notkamui.keval.Keval
-import discord4j.core.event.domain.message.MessageCreateEvent
-import reactor.core.publisher.Mono
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.build.CommandData
+import net.dv8tion.jda.api.interactions.commands.build.Commands
 
 /**
  * Evaluate a math expression and return the float result.
@@ -10,25 +12,29 @@ import reactor.core.publisher.Mono
  * For example:
  *   !math 2 + 2
  */
-object MathCommand: IDiscordCommand {
-    override fun execute(event: MessageCreateEvent, truncatedMessage: String): Mono<Void> {
-        val expression: String = event.message.content.split("!math").lastOrNull()?.trim() ?: return Mono.empty()
+object MathCommand: IDiscordGlobalCommand() {
 
-        val result = kotlin.runCatching {
-            Keval {
-                includeDefault()
-            }.eval(expression)
+    override val commandData: CommandData = Commands.slash("math", "Evaluate a mathematical expression")
+        .addOption(OptionType.STRING, "expression", "A mathematical expression", true)
+
+    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        if (isMatch(event)) {
+            event.deferReply().queue()
+
+            val expression = event.getOption("expression")?.asString ?: return
+
+            val result = kotlin.runCatching {
+                Keval {
+                    includeDefault()
+                }.eval(expression)
+            }
+
+
+            if (result.isFailure) {
+                event.hook.sendMessage("I didn't understand that expression").queue()
+            } else {
+                event.hook.sendMessage(result.getOrThrow().toString()).queue()
+            }
         }
-
-        return if (result.isFailure) {
-            event.message.channel
-                .flatMap { it.createMessage("I didn't understand that") }
-                .then()
-        } else {
-            event.message.channel
-                .flatMap { it.createMessage(result.getOrThrow().toString()) }
-                .then()
-        }
-
     }
 }
