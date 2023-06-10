@@ -3,8 +3,8 @@ CREATE TABLE if NOT EXISTS coordinate (
     lat FLOAT NOT NULL,
     lng FLOAT NOT NULL,
     altitude FLOAT,
-    route_id int,
+    route_id INT,
     created_date TIMESTAMP NOT NULL,
-    heart_rate bigint,
+    heart_rate INT,
     CONSTRAINT fk_route FOREIGN KEY(route_id) REFERENCES route(id)
 );
