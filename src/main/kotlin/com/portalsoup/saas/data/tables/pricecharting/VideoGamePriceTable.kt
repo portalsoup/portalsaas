@@ -1,42 +1,24 @@
 package com.portalsoup.saas.data.tables.pricecharting
 
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.javatime.date
-import org.jetbrains.exposed.sql.ResultRow
-import java.sql.ResultSet
-import java.time.LocalDate
 
 
 object VideoGamePriceTable : IntIdTable("video_game_price") {
-    val videoGameId = integer("video_game_id").references(VideoGameTable.priceChartingId)
+    val videoGame = reference("video_game_id", VideoGameTable)
     val loosePrice = varchar("loose_price", 50).nullable()
     val createdOn = date("created_on")
 }
 
-@Suppress("unused")
-data class VideoGamePrice(
-    val id: Int?,
-    val videoGameId: Int,
-    val loosePrice: String?,
-    val createdOn: LocalDate
-) {
-    companion object {
 
-        @Suppress("unused")
-        fun fromRow(resultRow: ResultRow) = VideoGamePrice(
-            id = resultRow[VideoGamePriceTable.id].value,
-            videoGameId = resultRow[VideoGamePriceTable.videoGameId],
-            loosePrice = resultRow[VideoGamePriceTable.loosePrice],
-            createdOn = resultRow[VideoGamePriceTable.createdOn]
-        )
+class VideoGamePrice(id: EntityID<Int>): IntEntity(id) {
 
-        @Suppress("unused")
-        fun fromSet(resultSet: ResultSet): VideoGamePrice = VideoGamePrice(
-            id = runCatching { resultSet.getInt("_id") }.getOrNull(),
-            videoGameId = resultSet.getInt("video_game_id"),
-            loosePrice = kotlin.runCatching { resultSet.getString("loose_price") }.getOrNull(),
-            createdOn = resultSet.getDate("created_on").toLocalDate()
+    companion object : IntEntityClass<VideoGamePrice>(VideoGamePriceTable)
 
-        )
-    }
+    var videoGame by VideoGame referencedOn VideoGamePriceTable.videoGame
+    var loosePrice by VideoGamePriceTable.loosePrice
+    var createdOn by VideoGamePriceTable.createdOn
 }

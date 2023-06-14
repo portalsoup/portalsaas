@@ -1,9 +1,10 @@
 package com.portalsoup.saas.data.tables.scryfall
 
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.javatime.date
-import java.time.LocalDate
 
 object MtgSetTable: IntIdTable("mtg_sets") {
     val name = varchar("name", 255)
@@ -15,28 +16,18 @@ object MtgSetTable: IntIdTable("mtg_sets") {
     val cardCount=  integer("card_count")
 }
 
-data class MtgSet(
-    val id: Int,
-    val name: String, // English name of the set
-    val code: String, // Unique 3-5 letter code for this set
-    val releasedDate: LocalDate?,
-    val setType: SetType,
-    val block: String?,
-    val blockCode: String?,
-    val cardCount: Int
-) {
-    companion object {
-        fun fromRow(resultRow: ResultRow) = MtgSet(
-            id = resultRow[MtgSetTable.id].value,
-            name = resultRow[MtgSetTable.name],
-            code = resultRow[MtgSetTable.code],
-            releasedDate = resultRow[MtgSetTable.releasedDate],
-            setType = resultRow[MtgSetTable.setType],
-            block = resultRow[MtgSetTable.block],
-            blockCode = resultRow[MtgSetTable.blockCode],
-            cardCount = resultRow[MtgSetTable.cardCount]
-        )
-    }
+
+class MtgSet(id: EntityID<Int>): IntEntity(id) {
+
+    companion object : IntEntityClass<MtgSet>(MtgSetTable)
+
+    var name by MtgSetTable.name
+    var code by MtgSetTable.code
+    var releasedDate by MtgSetTable.releasedDate
+    var setType by MtgSetTable.setType
+    var block by MtgSetTable.block
+    var blockCode by MtgSetTable.blockCode
+    var cardCount by MtgSetTable.cardCount
 }
 
 enum class SetType {

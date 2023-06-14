@@ -5,26 +5,17 @@ import com.portalsoup.saas.data.tables.HelloWorldTable
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 fun Routing.helloWorldApi() {
-
-    println("HELLO WORLD API")
-
     get("/hello") {
         val helloer: String = call.parameters["name"] ?: "Anonymous"
 
-        val previousHelloers: List<HelloWorld> = transaction {
-            val query: Query = HelloWorldTable.selectAll()
-
-            query.map {
-                HelloWorld.fromRow(it)
-            }
+        val previousHelloers = transaction {
+            HelloWorld.all().toList()
         }
 
         transaction {
