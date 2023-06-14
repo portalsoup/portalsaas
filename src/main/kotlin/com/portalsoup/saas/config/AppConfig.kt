@@ -5,10 +5,11 @@ import org.koin.core.component.KoinComponent
 
 data class AppConfig(
     val jdbcConfig: Jdbc,
+    val strava: Strava,
     val myDiscordID: String,
     val discordToken: String?,
     val pricechartingToken: String?,
-    val openaiToken: String?
+    val openaiToken: String?,
 ) : KoinComponent {
     companion object {
         fun default(environment: ApplicationEnvironment): AppConfig {
@@ -21,6 +22,8 @@ data class AppConfig(
             val discordToken = System.getenv("DISCORD_TOKEN") ?: environment.config.property("discord.token").getString()
             val pricechartingToken = System.getenv("PRICECHARTING_TOKEN") ?: environment.config.property("pricecharting.token").getString()
             val openaiToken = System.getenv("OPENAI_TOKEN") ?: environment.config.property("openai.token").getString()
+            val stravaToken = System.getenv("STRAVA_TOKEN") ?: environment.config.property("strava.token").getString()
+            val stravaAthleteID = System.getenv("STRAVA_ATHLETE_ID") ?: environment.config.property("strava.athleteID").getString()
 
             return AppConfig(
                 Jdbc(
@@ -30,6 +33,7 @@ data class AppConfig(
                     password = jdbcPassword,
                     maxPool = jdbcMaxPool
                 ),
+                Strava(stravaToken, stravaAthleteID),
                 discordToken = discordToken,
                 pricechartingToken = pricechartingToken,
                 openaiToken = openaiToken,
@@ -45,4 +49,9 @@ data class Jdbc(
     val username: String,
     val password: String,
     val maxPool: Int
+)
+
+data class Strava(
+    val token: String,
+    val athleteID: String
 )
