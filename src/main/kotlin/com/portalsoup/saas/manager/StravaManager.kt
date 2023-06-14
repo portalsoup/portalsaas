@@ -17,7 +17,11 @@ class StravaManager: Logging, KoinComponent {
     val appConfig by inject<AppConfig>()
 
     private suspend fun get(endpoint: String): JSONObject? = coroutineScope {
-        async { runCatching { JSONObject(Api.makeRequest("$baseUrl$endpoint")) }.getOrNull() }.await()
+        async {
+            runCatching {
+                JSONObject(Api.makeRequest("$baseUrl$endpoint"))
+            }.getOrNull()
+        }.await()
     }
 
     fun listRoutesAPI() {
