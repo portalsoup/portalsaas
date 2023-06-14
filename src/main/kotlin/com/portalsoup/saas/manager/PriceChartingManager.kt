@@ -15,7 +15,6 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -83,9 +82,7 @@ class PriceChartingManager: KoinComponent, Logging {
         )
 
         val maybeVideoGame: VideoGame? = transaction {
-            val resultRow = VideoGameTable.select { VideoGameTable.priceChartingId eq parsedGame.id }.singleOrNull()
-            resultRow
-                ?.let { VideoGame.fromRow(it) }
+            VideoGame.find { VideoGameTable.priceChartingId eq parsedGame.id }.singleOrNull()
         }
 
         if (maybeVideoGame == null) {
@@ -105,7 +102,7 @@ class PriceChartingManager: KoinComponent, Logging {
         transaction {
             gamePricesPersisted.incrementAndGet()
             VideoGamePriceTable.insert {
-                it[videoGameId] = parsedGame.id
+                it[videoGame] = parsedGame.id
                 it[loosePrice] = parsedGame.price
                 it[createdOn] = now
             }

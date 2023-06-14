@@ -1,10 +1,10 @@
 package com.portalsoup.saas.data.tables.pricecharting
 
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.javatime.date
-import java.sql.ResultSet
-import java.time.LocalDate
 
 object VideoGameTable : IntIdTable("video_game") {
     val priceChartingId = integer("pricecharting_id").uniqueIndex()
@@ -14,32 +14,13 @@ object VideoGameTable : IntIdTable("video_game") {
     val updatedOn = date("updated_on")
 }
 
-data class VideoGame(
-    val id: Int,
-    val pricechartingId: Int,
-    val consoleName: String,
-    val productName: String,
-    val createdOn: LocalDate,
-    val updatedOn: LocalDate
-) {
-    companion object {
-        fun fromRow(resultRow: ResultRow) = VideoGame(
-            id = resultRow[VideoGameTable.id].value,
-            pricechartingId = resultRow[VideoGameTable.priceChartingId],
-            consoleName = resultRow[VideoGameTable.consoleName],
-            productName = resultRow[VideoGameTable.productName],
-            createdOn = resultRow[VideoGameTable.createdOn],
-            updatedOn = resultRow[VideoGameTable.updatedOn]
-        )
+class VideoGame(id: EntityID<Int>): IntEntity(id) {
 
-        @Suppress("unused")
-        fun fromSet(resultSet: ResultSet): VideoGame = VideoGame(
-            id = resultSet.getInt("id"),
-            pricechartingId = resultSet.getInt("pricecharting_id"),
-            consoleName = resultSet.getString("console_name"),
-            productName = resultSet.getString("product_name"),
-            createdOn = resultSet.getDate("created_on").toLocalDate(),
-            updatedOn = resultSet.getDate("updated_on").toLocalDate()
-        )
-    }
+    companion object : IntEntityClass<VideoGame>(VideoGameTable)
+
+    var priceChartingId by VideoGameTable.priceChartingId
+    var consoleName by VideoGameTable.consoleName
+    var productName by VideoGameTable.productName
+    var createdOn by VideoGameTable.createdOn
+    var updatedOn by VideoGameTable.updatedOn
 }

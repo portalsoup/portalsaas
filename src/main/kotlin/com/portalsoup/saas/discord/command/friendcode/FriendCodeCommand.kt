@@ -46,9 +46,11 @@ object FriendCodeCommand: KoinComponent, IDiscordGlobalCommand() {
             }
 
             val maybeFoundCode: String = transaction {
-                FriendCodeTable.select { FriendCodeTable.user eq user.id }.singleOrNull()
+                FriendCode.find {
+                    FriendCodeTable.user eq user.id
+                }.singleOrNull()
             }
-                ?.let { FriendCode.fromRow(it).code }
+                ?.code
                 ?: "I didn't find a relevant Friend Code."
 
             event.hook.sendMessage(maybeFoundCode).queue()

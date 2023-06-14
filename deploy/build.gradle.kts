@@ -27,6 +27,8 @@ val discordToken: String? by project
 val myDiscordID: String by project
 val pricechartingToken: String? by project
 val openaiToken: String? by project
+val stravaToken: String by project
+val myStravaAthleteID: String by project
 
 // Shortcuts
 val ansibleDir = "$rootDir/infrastructure/ansible/"
@@ -314,7 +316,9 @@ tasks.register("ktor-config") {
             "discordToken" to discordToken,
             "pricechartingToken" to pricechartingToken,
             "openaiToken" to openaiToken,
-            "myDiscordID" to myDiscordID
+            "myDiscordID" to myDiscordID,
+            "stravaToken" to stravaToken,
+            "stravaAthleteID" to myStravaAthleteID
         ))
 
         if (dest.exists() && !dest.delete()) {

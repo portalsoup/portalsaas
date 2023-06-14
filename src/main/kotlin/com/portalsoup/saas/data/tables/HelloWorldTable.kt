@@ -1,25 +1,19 @@
 package com.portalsoup.saas.data.tables
 
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.javatime.date
-import java.time.LocalDate
 
 object HelloWorldTable : IntIdTable("hello_world") {
     val name = varchar("name", 50)
     val createdOn = date("created_on")
 }
 
-data class HelloWorld(
-    val id: Int,
-    val name: String,
-    val createdOn: LocalDate
-) {
-    companion object {
-        fun fromRow(resultRow: ResultRow) = HelloWorld(
-            id = resultRow[HelloWorldTable.id].value,
-            name = resultRow[HelloWorldTable.name],
-            createdOn = resultRow[HelloWorldTable.createdOn]
-        )
-    }
+class HelloWorld(id: EntityID<Int>): IntEntity(id) {
+    companion object : IntEntityClass<HelloWorld>(HelloWorldTable)
+
+    var name by HelloWorldTable.name
+    var createdOn by HelloWorldTable.createdOn
 }

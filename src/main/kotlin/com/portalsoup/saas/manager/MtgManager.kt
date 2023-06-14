@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.json.JSONArray
 import org.json.JSONObject
@@ -87,7 +86,7 @@ class MtgManager: Logging {
      * Fetch a card by name from scryfall's API.  Scryfall supports fuzzy searching
      */
     private suspend fun getRawCardAsync(term: String, set: String?): Deferred<JSONObject?> = coroutineScope {
-        val set = set?.let { transaction { MtgSetTable.select { MtgSetTable.name eq set }.firstOrNull()?.let { MtgSet.fromRow(it) } } }
+        val set = set?.let { transaction { MtgSet.find { MtgSetTable.name eq set }.firstOrNull() } }
         val setUrlPart = set?.let { "&set=${it.code}" } ?: ""
         async { runCatching { JSONObject(Api.makeRequest("$namedSearchUrl?fuzzy=$term$setUrlPart")) }.getOrNull() }
     }
@@ -102,9 +101,8 @@ class MtgManager: Logging {
 
     fun getSetsAutocomplete(): List<MtgSet> =
         transaction {
-            MtgSetTable.selectAll()
+            MtgSet.all()
                 .toList()
-                .map { MtgSet.fromRow(it) }
         }
 
     fun updateMtgSetsData() {
