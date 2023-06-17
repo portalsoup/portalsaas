@@ -2,7 +2,7 @@ package com.portalsoup.saas.discord.command.friendcode
 
 import com.portalsoup.saas.data.tables.FriendCode
 import com.portalsoup.saas.data.tables.FriendCodeTable
-import com.portalsoup.saas.discord.command.IDiscordGlobalCommand
+import com.portalsoup.saas.discord.command.IDiscordSlashCommand
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -22,7 +22,7 @@ import java.time.LocalDate
  * Retrieving another user's friend code requires an @mention on that user, this restricts the bot to only look up
  * users that share the common server with the requester.
  */
-object FriendCodeCommand: KoinComponent, IDiscordGlobalCommand() {
+object FriendCodeCommand: KoinComponent, IDiscordSlashCommand() {
 
     override val commandData: CommandData = Commands.slash("friendcode", "manage your switch friend code.")
         .addOption(OptionType.MENTIONABLE, "user", "The user whose code to look up.")
@@ -30,7 +30,7 @@ object FriendCodeCommand: KoinComponent, IDiscordGlobalCommand() {
         .addOption(OptionType.STRING, "add", "Add your Friend Code to the database if it doesn't already exist.")
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-        if (isMatch(event)) {
+        global(event) {
             event.deferReply().setEphemeral(true).queue()
 
             val user = event.getOption("user")?.asUser ?: event.user

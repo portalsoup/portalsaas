@@ -12,16 +12,16 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
  * For example:
  *   !math 2 + 2
  */
-object MathCommand: IDiscordGlobalCommand() {
+object MathCommand: IDiscordSlashCommand() {
 
     override val commandData: CommandData = Commands.slash("math", "Evaluate a mathematical expression")
         .addOption(OptionType.STRING, "expression", "A mathematical expression", true)
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-        if (isMatch(event)) {
+        global(event) {
             event.deferReply().queue()
 
-            val expression = event.getOption("expression")?.asString ?: return
+            val expression = event.getOption("expression")?.asString ?: return@global
 
             val result = kotlin.runCatching {
                 Keval {

@@ -23,8 +23,12 @@ repositories {
 val priceChartingKey: String by project
 val doToken: String? by project
 val doSshId: String? by project
+
 val discordToken: String? by project
 val myDiscordID: String by project
+val myDiscordGuildID: String by project
+val myDiscordGuildVIPChannelID: String by project
+
 val pricechartingToken: String? by project
 val openaiToken: String? by project
 val stravaToken: String by project
@@ -314,9 +318,11 @@ tasks.register("ktor-config") {
             "password" to password,
             "maxPool" to "10",
             "discordToken" to discordToken,
+            "myDiscordID" to myDiscordID,
+            "myDiscordGuildID" to myDiscordGuildID,
+            "myDiscordGuildVIPChannelID" to myDiscordGuildVIPChannelID,
             "pricechartingToken" to pricechartingToken,
             "openaiToken" to openaiToken,
-            "myDiscordID" to myDiscordID,
             "stravaToken" to stravaToken,
             "stravaAthleteID" to myStravaAthleteID
         ))

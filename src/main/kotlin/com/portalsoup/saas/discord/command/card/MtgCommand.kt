@@ -3,7 +3,7 @@ package com.portalsoup.saas.discord.command.card
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.data.tables.scryfall.SetType
-import com.portalsoup.saas.discord.command.IDiscordGlobalCommand
+import com.portalsoup.saas.discord.command.IDiscordSlashCommand
 import com.portalsoup.saas.manager.MtgManager
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 /**
  * Look up a magic the gathering card from scryfall and display its photo and details.
  */
-object MtgCommand: IDiscordGlobalCommand(), Logging {
+object MtgCommand: IDiscordSlashCommand(), Logging {
 
     val mtgManager = MtgManager()
 
@@ -25,7 +25,7 @@ object MtgCommand: IDiscordGlobalCommand(), Logging {
 
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-        if (isMatch(event)) {
+        global(event) {
             event.deferReply().queue()
 
             val term = event.getOption("name")?.asString
@@ -33,7 +33,7 @@ object MtgCommand: IDiscordGlobalCommand(), Logging {
 
             if (term == null) {
                 event.hook.sendMessage("Didn't catch that card name").queue()
-                return
+                return@global
             }
 
             val maybeFoundCard = runBlocking {

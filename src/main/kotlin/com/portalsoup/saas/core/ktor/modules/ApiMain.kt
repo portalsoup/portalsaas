@@ -1,19 +1,24 @@
 package com.portalsoup.saas.core.ktor.modules
 
+import com.portalsoup.saas.api.gpxApi
 import com.portalsoup.saas.api.healthcheckApi
 import com.portalsoup.saas.api.helloWorldApi
-import io.ktor.serialization.gson.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
 
 fun Application.api() {
     log.info("Initializing routing...")
 
 
     install(ContentNegotiation) {
-        gson()
+        json(Json {
+            prettyPrint = true
+            isLenient = true
+        })
     }
 
     install(Routing) {
@@ -23,6 +28,7 @@ fun Application.api() {
         route("/api") {
             this@install.healthcheckApi()
             this@install.helloWorldApi()
+            this@install.gpxApi()
         }
     }
 }

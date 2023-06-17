@@ -20,7 +20,8 @@
         },
         {
           "shell_command": [
-            "./gradlew -t build"
+            "./gradlew build",
+            "echo 'Run \"./gradlew -t build\" to watch.'"
           ]
         }
       ],

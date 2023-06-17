@@ -14,6 +14,12 @@ object Api: KoinComponent, Logging {
     private val client by inject<HttpClient>()
 
 
+    suspend fun get(url: String, queryHeaders: Map<String, String> = mapOf()): HttpResponse {
+        return client.get(url) {
+            headers { queryHeaders.onEach { append(it.key, it.value) } }
+        }
+    }
+
     suspend fun makeRequest(url: String, queryHeaders: Map<String, String> = mapOf()): String {
         val response: HttpResponse = client.get(url) {
             headers { queryHeaders.onEach { append(it.key, it.value) } }

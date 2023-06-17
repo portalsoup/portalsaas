@@ -8,6 +8,9 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.JDA
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -28,7 +31,15 @@ sealed interface KoinModules {
         override fun shouldInitialize(): Boolean = true
 
         override fun initialize(): Module = module {
-            single { HttpClient(CIO) }
+            single { HttpClient(CIO) {
+                install(ContentNegotiation) {
+                    json(Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    })
+                }
+            } }
         }
     }
 
@@ -44,7 +55,7 @@ sealed interface KoinModules {
     }
 
     data class DiscordModule(val appConfig: AppConfig): KoinModules {
-        override fun shouldInitialize() = appConfig.discordToken.isNullOrEmpty().not()
+        override fun shouldInitialize() = appConfig.discord.token.isNullOrEmpty().not()
         override fun initialize(): Module {
             val client: JDA = DiscordClientBuilder.build(appConfig)
             return module {

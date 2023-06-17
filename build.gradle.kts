@@ -19,17 +19,17 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core:2.3.0")
-    implementation("io.ktor:ktor-server-netty-jvm:2.3.0")
-    implementation("io.ktor:ktor-client-core:2.3.0")
-    implementation("io.ktor:ktor-client-cio:2.3.0")
-    implementation("io.ktor:ktor-network-tls-certificates:2.3.0")
-    implementation("io.ktor:ktor-server-cors:2.3.0")
+    implementation("io.ktor:ktor-server-core:2.3.1")
+    implementation("io.ktor:ktor-server-netty-jvm:2.3.1")
+    implementation("io.ktor:ktor-client-core:2.3.1")
+    implementation("io.ktor:ktor-client-cio:2.3.1")
+    implementation("io.ktor:ktor-network-tls-certificates:2.3.1")
+    implementation("io.ktor:ktor-server-cors:2.3.1")
     implementation("io.ktor:ktor-auth-jwt:1.6.8")
-    implementation("io.ktor:ktor-gson:1.6.8")
-    implementation("io.ktor:ktor-server-sessions:2.3.0")
-    implementation("io.ktor:ktor-server-content-negotiation:2.3.0")
-    implementation("io.ktor:ktor-serialization-gson:2.3.0")
+    implementation("io.ktor:ktor-server-sessions:2.3.1")
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
 
     implementation("org.quartz-scheduler:quartz:2.3.2")
 
@@ -44,6 +44,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
 
     implementation("io.insert-koin:koin-core:3.4.0")
+
 
     implementation("io.jenetics:jpx:3.0.1")
     implementation("ch.qos.logback:logback-classic:1.4.5")
@@ -71,6 +72,8 @@ application {
 
 tasks {
     named<ShadowJar>("shadowJar") {
+//        inputs.dir("$rootDir/src")
+
         mustRunAfter("client:package")
         archiveBaseName.set("shadow")
         archiveVersion.set("")

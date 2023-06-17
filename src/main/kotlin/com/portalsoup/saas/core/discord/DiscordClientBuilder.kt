@@ -6,6 +6,6 @@ import net.dv8tion.jda.api.JDABuilder
 
 object DiscordClientBuilder {
 
-    fun build(appConfig: AppConfig): JDA = JDABuilder.createDefault(appConfig.discordToken).build()
+    fun build(appConfig: AppConfig): JDA = JDABuilder.createDefault(appConfig.discord.token).build()
 
 }
