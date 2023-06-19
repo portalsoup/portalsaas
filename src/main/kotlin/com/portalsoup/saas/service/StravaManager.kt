@@ -1,4 +1,4 @@
-package com.portalsoup.saas.manager
+package com.portalsoup.saas.service
 
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.extensions.Logging

@@ -1,4 +1,4 @@
-package com.portalsoup.saas.manager
+package com.portalsoup.saas.service
 
 import com.portalsoup.saas.core.extensions.*
 import com.portalsoup.saas.core.web.Api

@@ -48,7 +48,7 @@ sealed class Scope(val event: SlashCommandInteractionEvent): KoinComponent {
 
     abstract fun shouldRun(event: SlashCommandInteractionEvent): Boolean
     internal operator fun invoke(l: () -> Unit) {
-        event.deferReply()
+        event.deferReply().queue()
         l.takeIf { shouldRun(event) }
             .also { println("Should run? ${shouldRun(event)}") }
             ?.let { it() }

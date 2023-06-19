@@ -1,6 +1,6 @@
 package com.portalsoup.saas.api
 
-import com.portalsoup.saas.manager.StravaManager
+import com.portalsoup.saas.service.StravaManager
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*

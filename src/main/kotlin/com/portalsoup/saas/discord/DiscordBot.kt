@@ -26,7 +26,6 @@ class DiscordBot: KoinComponent, Logging {
      * This is the bot entrypoint
      */
     fun init() {
-        client.awaitReady()
 
         val guild = client.getGuildById(appConfig.discord.guildID)
 

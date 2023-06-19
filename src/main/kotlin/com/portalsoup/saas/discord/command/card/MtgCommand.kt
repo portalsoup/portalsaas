@@ -4,7 +4,7 @@ import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.data.tables.scryfall.SetType
 import com.portalsoup.saas.discord.command.IDiscordSlashCommand
-import com.portalsoup.saas.manager.MtgManager
+import com.portalsoup.saas.service.MtgManager
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent

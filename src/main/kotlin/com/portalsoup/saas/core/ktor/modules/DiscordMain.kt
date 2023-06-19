@@ -3,7 +3,7 @@ package com.portalsoup.saas.core.ktor.modules
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.discord.DiscordClientBuilder
 import com.portalsoup.saas.discord.DiscordBot
-import com.portalsoup.saas.manager.MtgManager
+import com.portalsoup.saas.service.MtgManager
 import io.ktor.server.application.*
 
 //val foo by lazy { KoinPlatformTools.defaultContext().get().get<AppConfig>() }

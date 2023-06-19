@@ -1,4 +1,4 @@
-package com.portalsoup.saas.manager
+package com.portalsoup.saas.service
 
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.extensions.Logging
@@ -52,7 +52,7 @@ class PriceChartingManager: KoinComponent, Logging {
                         while (!packet.isEmpty) {
                             val bytes = packet.readBytes()
                             tmpFile.appendBytes(bytes)
-                            log().info("Received ${tmpFile.length()} bytes from ${response.contentLength()}")
+                            log().trace("Received ${tmpFile.length()} bytes from ${response.contentLength()}")
                         }
                     }
                 }
@@ -86,7 +86,7 @@ class PriceChartingManager: KoinComponent, Logging {
         }
 
         if (maybeVideoGame == null) {
-            log().info("Found a new game $parsedGame")
+            log().trace("Found a new game {}", parsedGame)
             gamesPersisted.incrementAndGet()
             transaction {
                 VideoGameTable.insert {

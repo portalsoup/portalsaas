@@ -23,4 +23,6 @@ class Coordinate(id: EntityID<Int>): IntEntity(id) {
     var lng by CoordinateTable.lng
     var altitude by CoordinateTable.altitude
     var route by Route referencedOn CoordinateTable.route
+    var created by CoordinateTable.created
+    var heartRate by CoordinateTable.heartRate
 }
