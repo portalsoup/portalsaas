@@ -16,6 +16,9 @@ repositories {
     maven {
         url = uri("https://m2.dv8tion.net/releases")
     }
+    maven {
+        url = uri("https://josm.openstreetmap.de/nexus/content/groups/public")
+    }
 }
 
 dependencies {
@@ -33,7 +36,6 @@ dependencies {
 
     implementation("org.quartz-scheduler:quartz:2.3.2")
 
-    implementation("io.jenetics:jpx:3.0.1")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.flywaydb:flyway-core:9.17.0")
 
@@ -46,7 +48,10 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.4.0")
 
 
+    //gpx
     implementation("io.jenetics:jpx:3.0.1")
+    implementation("org.openstreetmap.jmapviewer:jmapviewer:2.0")
+
     implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("org.json:json:20220924")
@@ -89,7 +94,7 @@ tasks {
     }
 
     register("deploy") {
-        dependsOn(shadowJar)
+        mustRunAfter(shadowJar)
     }
 
     clean {
@@ -98,7 +103,7 @@ tasks {
     }
 
     build {
-        dependsOn(shadowJar)
+        mustRunAfter(shadowJar)
     }
 
     create<Delete>("deleteStaticAssets") {

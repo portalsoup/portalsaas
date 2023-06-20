@@ -42,7 +42,7 @@ val pathToResources = "$rootDir/src/main/resources/"
 
 rootProject.tasks {
     getByName("processResources") {
-        dependsOn("deploy:ktor-config")
+        mustRunAfter("deploy:ktor-config")
     }
 
     getByName("compileKotlin") {
@@ -50,7 +50,7 @@ rootProject.tasks {
     }
 
     getByName("build") {
-        dependsOn("deploy:ktor-config")
+        mustRunAfter("deploy:ktor-config")
     }
 }
 

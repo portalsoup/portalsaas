@@ -4,9 +4,10 @@ import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
-import com.portalsoup.saas.discord.command.UploadGpxCommand
 import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.FriendCodeCommand
+import com.portalsoup.saas.discord.command.gpx.RenderGpxMapCommand
+import com.portalsoup.saas.discord.command.gpx.UploadGpxCommand
 import net.dv8tion.jda.api.JDA
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -45,7 +46,9 @@ class DiscordBot: KoinComponent, Logging {
                 MathCommand.commandData,
                 DiceRollCommand.commandData,
                 FriendCodeCommand.commandData,
-                MtgCommand.commandData
+                MtgCommand.commandData,
+
+                RenderGpxMapCommand.commandData
             ).queue()
 
 
@@ -54,6 +57,7 @@ class DiscordBot: KoinComponent, Logging {
         client.addEventListener(FriendCodeCommand)
         client.addEventListener(MtgCommand)
         client.addEventListener(UploadGpxCommand)
+        client.addEventListener(RenderGpxMapCommand)
 
     }
 

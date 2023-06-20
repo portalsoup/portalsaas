@@ -1,6 +1,6 @@
 rootProject.tasks {
     getByName("processResources") {
-        dependsOn("client:package")
+        mustRunAfter("client:package")
     }
 }
 
