@@ -35,7 +35,9 @@
       networks:
         - server
     client:
-      image: httpd:latest
+      build:
+        context: .
+        dockerfile: docker/Dockerfile.client
       ports:
         - '80:80'
       volumes:

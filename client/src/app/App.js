@@ -33,6 +33,7 @@ const Root = () => {
     return <div>
         <div>
             <Navbar/>
+            This is the navbar
         </div>
         <div>
             <Outlet></Outlet>
