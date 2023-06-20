@@ -1,0 +1,19 @@
+{
+  "session_name": "portalsaas-client",
+  "focus": "true",
+  "start_directory": "/home/portalsoup/IdeaProjects/portalsaas/client",
+  "windows": [{
+      "options": {},
+      "window_name": "zsh",
+      "layout": "38c0,211x49,0,0{105x49,0,0,0,105x49,106,0,1}",
+      "panes": [{
+          "shell_command": "docker-compose build && docker-compose up client",
+          "focus": "true"
+        }, {
+          "shell_command": [
+            "npm i",
+            "npm run watch"
+          ]}
+      ]
+  }]
+}
