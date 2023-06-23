@@ -8,7 +8,7 @@ and be a stable place to deploy personally useful code.
 * Kotlin
   * Ktor-server (Web server)
   * Ktor-client (Web client)
-  * Discord4j (Discord API bindings)
+  * JDA (Java Discord API) (Discord API bindings)
   * Exposed (SQL library)
 * Infrastructure
   * Gradle
