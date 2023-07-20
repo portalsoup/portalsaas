@@ -7,5 +7,4 @@ CREATE TABLE mtg_sets (
     block VARCHAR ( 255 ),
     block_code VARCHAR ( 10 ),
     card_count INT
-
 );

@@ -3,7 +3,7 @@ package com.portalsoup.saas.discord.command.card
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
 import com.portalsoup.saas.data.tables.scryfall.SetType
-import com.portalsoup.saas.discord.command.IDiscordSlashCommand
+import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
 import com.portalsoup.saas.service.MtgManager
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 /**
  * Look up a magic the gathering card from scryfall and display its photo and details.
  */
-object MtgCommand: IDiscordSlashCommand(), Logging {
+object MtgCommand: AbstractDiscordSlashCommand(), Logging {
 
     val mtgManager = MtgManager()
 

@@ -1,24 +1,19 @@
 package com.portalsoup.saas.discord.command
 
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.core.extensions.Logging
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-abstract class IDiscordCommand: Logging, ListenerAdapter() {
-
-}
-
-abstract class IDiscordSlashCommand: IDiscordCommand(), KoinComponent {
+abstract class AbstractDiscordSlashCommand: ListenerAdapter(), KoinComponent {
 
     val appConfig by inject<AppConfig>()
 
     abstract val commandData: CommandData
 
-    fun private(event: SlashCommandInteractionEvent, l: IDiscordCommand.() -> Unit) {
+    fun private(event: SlashCommandInteractionEvent, l: ListenerAdapter.() -> Unit) {
         println("In private wrapper")
         if (isMatch(event)) {
             println("Matched event")

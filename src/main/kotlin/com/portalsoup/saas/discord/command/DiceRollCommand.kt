@@ -13,7 +13,7 @@ import kotlin.random.Random
  * Example:
  *   !roll 5D100
  */
-object DiceRollCommand: IDiscordSlashCommand() {
+object DiceRollCommand: AbstractDiscordSlashCommand() {
     override val commandData: CommandData = Commands.slash("roll", "Roll a quantity of die")
         .addOption(OptionType.INTEGER, "sides", "The amount of sides does dice has")
         .addOption(OptionType.INTEGER, "quantity", "The amount of die to throw")

@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
  * For example:
  *   !math 2 + 2
  */
-object MathCommand: IDiscordSlashCommand() {
+object MathCommand: AbstractDiscordSlashCommand() {
 
     override val commandData: CommandData = Commands.slash("math", "Evaluate a mathematical expression")
         .addOption(OptionType.STRING, "expression", "A mathematical expression", true)

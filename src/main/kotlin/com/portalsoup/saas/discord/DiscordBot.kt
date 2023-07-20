@@ -47,7 +47,6 @@ class DiscordBot: KoinComponent, Logging {
                 DiceRollCommand.commandData,
                 FriendCodeCommand.commandData,
                 MtgCommand.commandData,
-
                 RenderGpxMapCommand.commandData
             ).queue()
 

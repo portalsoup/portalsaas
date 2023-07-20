@@ -12,11 +12,11 @@ import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource.Mapnik
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.MediaTracker
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_RGB
 import java.util.*
 import javax.swing.JFrame
-import javax.swing.JPanel
 
 
 fun <R> Optional<R>.orNull(): R? = this.orElse(null)
@@ -38,22 +38,27 @@ class OpenMapsManager: Logging {
     fun renderMap(gpx: GPX? = null): BufferedImage {
 
         val defaultStartingPosition = Coordinate(0.0, 0.0)
+        val mediaTracker = MediaTracker(mapTree)
 
             mapTree.apply {
                 gpx?.also { viewer.setDisplayToFitMapPolygons() } ?: viewer.setDisplayPosition(defaultStartingPosition, 4)
                 gpx?.let { generatePolygons(it) }?.map { viewer.addMapPolygon(it) }
             }
 
-        val panel = JPanel()
+
+        mediaTracker.waitForAll()
+        val image = mapTree.createImage(dimensions.width, dimensions.height)
+
+//        val panel = JPanel()
         val bufferedImage = BufferedImage(dimensions.width, dimensions.height, TYPE_INT_RGB)
 
-        panel.size = dimensions
-        panel.add(mapTree)
-        panel.revalidate()
+//        panel.size = dimensions
+//        panel.add(mapTree)
 
-        Thread.sleep(5000)
+        val bufferedG = bufferedImage.createGraphics()
+        bufferedG.drawImage(image, 0, 0, null)
+        bufferedG.dispose()
 
-        panel.paint(bufferedImage.graphics)
 
         return bufferedImage
     }
