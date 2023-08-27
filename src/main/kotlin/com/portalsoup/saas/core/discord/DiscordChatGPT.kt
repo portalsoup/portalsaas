@@ -7,7 +7,7 @@ import org.koin.core.component.inject
 
 object DiscordChatGPT: KoinComponent {
 
-    val appConfig: AppConfig by inject()
+    val appConfig by inject<AppConfig>()
 
     fun gpt(prompt: String): String? {
         return "I got this"

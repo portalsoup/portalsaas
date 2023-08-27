@@ -1,6 +1,8 @@
 package com.portalsoup.saas.discord.command
 
 import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
@@ -31,8 +33,17 @@ abstract class AbstractDiscordSlashCommand: ListenerAdapter(), KoinComponent {
         if (isMatch(event)) l()
     }
 
-    private fun isMatch(event: SlashCommandInteractionEvent): Boolean {
-        return event.name == commandData.name
+    private fun isMatch(event: SlashCommandInteractionEvent): Boolean = event.name == commandData.name
+
+    fun isAutocompleteMatch(event: CommandAutoCompleteInteractionEvent, option: String) =
+        event.name == VideoGameLookupCommand.commandData.name && event.focusedOption.name == option
+
+    fun x(event: CommandAutoCompleteInteractionEvent, preserveCase: Boolean = false): String {
+        val optionValue = event.focusedOption.value
+        return when {
+            preserveCase -> optionValue
+            else -> optionValue.lowercase()
+        }
     }
 }
 

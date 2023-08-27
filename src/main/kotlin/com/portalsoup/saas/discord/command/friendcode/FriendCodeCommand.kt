@@ -4,6 +4,7 @@ import com.portalsoup.saas.data.tables.FriendCode
 import com.portalsoup.saas.data.tables.FriendCodeTable
 import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
@@ -13,75 +14,102 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.koin.core.component.KoinComponent
 import java.time.LocalDate
 
 /**
  * Retrieve your or another user's friend code.
  *
- * Retrieving another user's friend code requires an @mention on that user, this restricts the bot to only look up
+ * Retrieving another user's friend code requires a @mention on that user, this restricts the bot to only look up
  * users that share the common server with the requester.
  */
 object FriendCodeCommand: KoinComponent, AbstractDiscordSlashCommand() {
 
-    override val commandData: CommandData = Commands.slash("friendcode", "manage your switch friend code.")
+    /**
+     * Match the format of a switch friend code: SW-####-####-####
+     */
+    private val friendCodeRegex: Regex = "SW-[0-9]{4}-[0-9]{4}-[0-9]{4}".toRegex()
+    enum class OPTIONS { GET, ADD, REMOVE, UPDATE }
+
+    override val commandData: CommandData = Commands.slash("friend-code", "manage your switch friend code.")
         .addOption(OptionType.MENTIONABLE, "user", "The user whose code to look up.")
-        .addOption(OptionType.BOOLEAN, "remove", "Remove your own Friend Code from the database.")
-        .addOption(OptionType.STRING, "add", "Add your Friend Code to the database if it doesn't already exist.")
+        .addOption(OptionType.STRING, "code", "Add your Friend Code to the database if it doesn't already exist.")
+        .addOption(OptionType.STRING, "action", "What action would you like to perform?")
+
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+        val optionValue = event.focusedOption.value.lowercase()
+
+        OPTIONS.values()
+            .takeIf { isAutocompleteMatch(event, "action") }
+            ?.map { it.name.lowercase() }
+            ?.filter { it.startsWith(optionValue) }
+            ?.take(25) // There aren't 25 options, but this is an observed limit on the discord side
+            ?.let { event.replyChoiceStrings(it).queue() }
+    }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         global(event) {
             event.deferReply().setEphemeral(true).queue()
 
             val user = event.getOption("user")?.asUser ?: event.user
-            val remove = event.getOption("remove")?.asBoolean ?: false
-            val code = event.getOption("add")?.asString ?: ""
+            val code = event.getOption("code")?.asString?.takeIf { validateFriendCodeFormat(it) }
+            val action = event.getOption("action")?.asString?.uppercase()
+                ?.let { OPTIONS.valueOf(it) }
+                ?: OPTIONS.GET
 
-            if (remove) {
-                removeUser(user)
-            }
-
-            if (code.isNotEmpty()) {
-                addCode(user, event)
-            }
-
-            val maybeFoundCode: String = transaction {
-                FriendCode.find {
-                    FriendCodeTable.user eq user.id
-                }.singleOrNull()
-            }
-                ?.code
-                ?: "I didn't find a relevant Friend Code."
-
-            event.hook.sendMessage(maybeFoundCode).queue()
-        }
-    }
-
-    private fun removeUser(user: User) {
-        transaction {
-            FriendCodeTable.deleteWhere { FriendCodeTable.user eq user.id }
-        }
-    }
-
-    private fun addCode(user: User, event: SlashCommandInteractionEvent) {
-        val userMaybeExists = transaction {
-            FriendCodeTable.select { FriendCodeTable.user eq user.id }
-                .firstOrNull()
-        }
-
-        if (userMaybeExists != null) {
-            return event.hook.sendMessage("I already have your code").queue()
-        } else {
-
-            transaction {
-                FriendCodeTable.insert {
-                    it[FriendCodeTable.user] = user.id
-                    it[FriendCodeTable.code] = code
-                    it[createdOn] = LocalDate.now()
+            val response: String = transaction {
+                when (action) {
+                    OPTIONS.GET -> { lookupCode(user) }
+                    OPTIONS.ADD -> { addCode(user, code) }
+                    OPTIONS.REMOVE -> {removeCodesForUser(user) }
+                    OPTIONS.UPDATE -> { updateCode(user, code) }
                 }
             }
 
-            event.hook.sendMessage("I added your friend code to my database.")
+            event.hook.sendMessage(response).queue()
         }
     }
+
+    private fun lookupCode(user: User) =
+        FriendCode.find { FriendCodeTable.user eq user.id }
+            .singleOrNull()
+            ?.code
+            ?: "I didn't find that Friend Code"
+
+    private fun removeCodesForUser(user: User): String {
+        FriendCodeTable.deleteWhere { FriendCodeTable.user eq user.id }
+        return "Removed"
+    }
+
+    private fun addCode(user: User, code: String?): String {
+        val userMaybeExists = FriendCodeTable
+            .select { FriendCodeTable.user eq user.id }
+            .firstOrNull()
+
+        return if (userMaybeExists != null) {
+            "I already have your code, use the \"update\" action if you want to change it"
+        } else if (code == null) {
+            "The code you provided appears to be invalid"
+        } else {
+            FriendCodeTable.insert {
+                it[FriendCodeTable.user] = user.id
+                it[FriendCodeTable.code] = code
+                it[createdOn] = LocalDate.now()
+            }
+            "I added your friend code to my database"
+        }
+    }
+
+    private fun updateCode(user: User, code: String?): String {
+        if (code == null) {
+            return "That's an invalid code"
+        }
+        FriendCodeTable.update({FriendCodeTable.user eq user.id }) {
+            it[FriendCodeTable.code] = code
+        }
+        return "Updated your code"
+    }
+    private fun validateFriendCodeFormat(code: String?): Boolean =
+        code?.takeIf { friendCodeRegex.matches(code) } != null
 }
