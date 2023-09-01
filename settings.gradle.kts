@@ -11,3 +11,4 @@ rootProject.name = "portalsaas"
 
 include("deploy", "client", "discord")
 include("core")
+include("api")

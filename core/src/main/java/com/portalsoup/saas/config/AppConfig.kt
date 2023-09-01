@@ -1,52 +1,40 @@
 package com.portalsoup.saas.config
 
-import io.ktor.server.application.*
-import org.koin.core.component.KoinComponent
 
-data class AppConfig(
-    val discord: Discord,
-    val jdbcConfig: Jdbc,
-    val strava: Strava,
-    val pricechartingToken: String?,
-    val openaiToken: String?,
-) : KoinComponent {
-    companion object {
-        fun default(environment: ApplicationEnvironment): AppConfig {
-            val jdbcUrl = System.getenv("JDBC_URL") ?: environment.config.property("jdbc.url").getString()
-            val jdbcDriver = System.getenv("JDBC_DRIVER") ?: environment.config.property("jdbc.driver").getString()
-            val jdbcUsername = System.getenv("JDBC_USERNAME") ?: environment.config.property("jdbc.username").getString()
-            val jdbcPassword = System.getenv("JDBC_PASSWORD") ?: environment.config.property("jdbc.password").getString()
-            val jdbcMaxPool = System.getenv("JDBC_MAX_POOL")?.toInt() ?: environment.config.property("jdbc.maxPool").getString().toInt()
-            
-            val myDiscordID = environment.config.property("discord.userID").getString()
-            val discordToken = environment.config.property("discord.token").getString()
-            val discordGuildID = environment.config.property("discord.guildID").getString()
-            val discordGuildVIPID = environment.config.property("discord.guildVIPChannelID").getString()
-            
-            val pricechartingToken = environment.config.property("pricecharting.token").getString()
-            val openaiToken = environment.config.property("openai.token").getString()
-            val stravaToken = environment.config.property("strava.token").getString()
-            val stravaAthleteID = environment.config.property("strava.athleteID").getString()
+object AppConfig {
+    val discord: Discord = readDiscord()
+    val jdbc: Jdbc = readJdbc()
+    val strava: Strava = readStrava()
 
-            return AppConfig(
-                discord = Discord(
-                    token = discordToken,
-                    userID = myDiscordID,
-                    guildID = discordGuildID,
-                    guildVIPChannelID = discordGuildVIPID
-                ),
-                jdbcConfig = Jdbc(
-                    url = jdbcUrl,
-                    driver = jdbcDriver,
-                    username = jdbcUsername,
-                    password = jdbcPassword,
-                    maxPool = jdbcMaxPool
-                ),
-                strava = Strava(stravaToken, stravaAthleteID),
-                pricechartingToken = pricechartingToken,
-                openaiToken = openaiToken,
-            )
-        }
+    val pricechartingToken = System.getenv("PRICECHARTING_TOKEN") ?: throw IllegalStateException("No Pricecharting token found.")
+    val openaiToken = System.getenv("OPENAI_TOKEN") ?: throw IllegalStateException("No Open AI token found.")
+
+
+    private fun readDiscord(): Discord {
+        val userId = System.getenv("DISCORD_USER_ID") ?: throw IllegalStateException("No Discord user ID found.")
+        val token = System.getenv("DISCORD_TOKEN") ?: throw IllegalStateException("No Discord token found.")
+        val guildId = System.getenv("DISCORD_GUILD_ID") ?: throw IllegalStateException("No Discord guild ID found.")
+        val guildVipId = System.getenv("DISCORD_VIP_GUILD_ID") ?: throw IllegalStateException("No Discord vip guild ID found.")
+
+        return Discord(token, userId, guildId, guildVipId)
+    }
+
+    private fun readJdbc(): Jdbc {
+        val jdbcUrl = System.getenv("JDBC_URL") ?: throw IllegalStateException("No JDBC URL found.")
+        val jdbcDriver = System.getenv("JDBC_DRIVER") ?: throw IllegalStateException("No No JDBC driver found.")
+        val jdbcUsername = System.getenv("JDBC_USERNAME") ?: throw IllegalStateException("No JDBC username found.")
+        val jdbcPassword = System.getenv("JDBC_PASSWORD") ?: throw IllegalStateException("No JDBC password found.")
+        val jdbcMaxPool = System.getenv("JDBC_MAX_POOL")?.toInt() ?: throw IllegalStateException("No JDBC max pool found.")
+
+        return Jdbc(jdbcUrl, jdbcDriver, jdbcUsername, jdbcPassword, jdbcMaxPool)
+
+    }
+
+    private fun readStrava(): Strava {
+        val token = System.getenv("STRAVA_TOKEN") ?: throw IllegalStateException("No Strava token found.")
+        val athleteID = System.getenv("STRAVA_ATHLETE_ID") ?: throw IllegalStateException("No Strava athlete ID found.")
+
+        return Strava(token, athleteID)
     }
 }
 

@@ -6,43 +6,10 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("plugin.serialization") version "1.7.21"
 }
-val kotlinVersion: String by extra("1.8.21")
-val kotlinxVersion: String by extra("1.7.3")
-val ktorVersion: String by extra("2.3.3")
-val mockkVersion: String by extra("1.13.7")
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
-
-
     implementation(project(":core"))
-    implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-netty-jvm")
-    implementation("io.ktor:ktor-client-core")
-    implementation("io.ktor:ktor-client-cio")
-    implementation("io.ktor:ktor-network-tls-certificates")
-    implementation("io.ktor:ktor-server-cors")
-    implementation("io.ktor:ktor-auth-jwt")
-    implementation("io.ktor:ktor-server-sessions")
-    implementation("io.ktor:ktor-server-content-negotiation")
-    implementation("io.ktor:ktor-client-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
-
-    implementation("org.quartz-scheduler:quartz")
-
-    implementation("com.zaxxer:HikariCP")
-    implementation("org.flywaydb:flyway-core")
-
-    implementation("org.postgresql:postgresql")
-    implementation("org.jetbrains.exposed:exposed-core")
-    implementation("org.jetbrains.exposed:exposed-dao")
-    implementation("org.jetbrains.exposed:exposed-java-time")
-    implementation("org.jetbrains.exposed:exposed-jdbc")
-
-    implementation("io.insert-koin:koin-core")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     //gpx
     implementation("io.jenetics:jpx")

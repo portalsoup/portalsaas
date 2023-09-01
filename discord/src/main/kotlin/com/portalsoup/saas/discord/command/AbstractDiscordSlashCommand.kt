@@ -6,12 +6,8 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-abstract class AbstractDiscordSlashCommand: ListenerAdapter(), KoinComponent {
-
-    val appConfig by inject<AppConfig>()
+abstract class AbstractDiscordSlashCommand: ListenerAdapter() {
 
     abstract val commandData: CommandData
 
@@ -48,9 +44,7 @@ abstract class AbstractDiscordSlashCommand: ListenerAdapter(), KoinComponent {
 }
 
 
-sealed class Scope(val event: SlashCommandInteractionEvent): KoinComponent {
-
-    val appConfig by inject<AppConfig>()
+sealed class Scope(val event: SlashCommandInteractionEvent) {
 
     abstract fun shouldRun(event: SlashCommandInteractionEvent): Boolean
     internal operator fun invoke(l: () -> Unit) {
@@ -63,11 +57,11 @@ sealed class Scope(val event: SlashCommandInteractionEvent): KoinComponent {
 
 class Private(event: SlashCommandInteractionEvent): Scope(event) {
     override fun shouldRun(event: SlashCommandInteractionEvent): Boolean {
-        return appConfig.discord.userID == event.user.id
+        return AppConfig.discord.userID == event.user.id
     }
 }
 class Guild(event: SlashCommandInteractionEvent): Scope(event) {
     override fun shouldRun(event: SlashCommandInteractionEvent): Boolean {
-        return appConfig.discord.guildID == (event.guild?.id ?: return false)
+        return AppConfig.discord.guildID == (event.guild?.id ?: return false)
     }
 }

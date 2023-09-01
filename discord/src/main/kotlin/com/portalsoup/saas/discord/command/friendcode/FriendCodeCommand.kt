@@ -1,22 +1,12 @@
 package com.portalsoup.saas.discord.command.friendcode
 
-import com.portalsoup.saas.data.tables.FriendCode
-import com.portalsoup.saas.data.tables.FriendCodeTable
 import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
-import net.dv8tion.jda.api.entities.User
+import com.portalsoup.saas.service.FriendCodeManager
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.api.interactions.commands.build.Commands
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import org.koin.core.component.KoinComponent
-import java.time.LocalDate
 
 /**
  * Retrieve your or another user's friend code.
@@ -24,7 +14,7 @@ import java.time.LocalDate
  * Retrieving another user's friend code requires a @mention on that user, this restricts the bot to only look up
  * users that share the common server with the requester.
  */
-object FriendCodeCommand: KoinComponent, AbstractDiscordSlashCommand() {
+object FriendCodeCommand: AbstractDiscordSlashCommand() {
 
     /**
      * Match the format of a switch friend code: SW-####-####-####
@@ -58,58 +48,17 @@ object FriendCodeCommand: KoinComponent, AbstractDiscordSlashCommand() {
                 ?.let { OPTIONS.valueOf(it) }
                 ?: OPTIONS.GET
 
-            val response: String = transaction {
-                when (action) {
-                    OPTIONS.GET -> { lookupCode(user) }
-                    OPTIONS.ADD -> { addCode(user, code) }
-                    OPTIONS.REMOVE -> {removeCodesForUser(user) }
-                    OPTIONS.UPDATE -> { updateCode(user, code) }
-                }
+            val response: String = when (action) {
+                OPTIONS.GET -> { FriendCodeManager.lookupFriendCode(user) }
+                OPTIONS.ADD -> { FriendCodeManager.addFriendCode(user, code) }
+                OPTIONS.REMOVE -> { FriendCodeManager.removeFriendCode(user) }
+                OPTIONS.UPDATE -> { FriendCodeManager.updateFriendCode(user, code) }
             }
 
             event.hook.sendMessage(response).queue()
         }
     }
 
-    private fun lookupCode(user: User) =
-        FriendCode.find { FriendCodeTable.user eq user.id }
-            .singleOrNull()
-            ?.code
-            ?: "I didn't find that Friend Code"
-
-    private fun removeCodesForUser(user: User): String {
-        FriendCodeTable.deleteWhere { FriendCodeTable.user eq user.id }
-        return "Removed"
-    }
-
-    private fun addCode(user: User, code: String?): String {
-        val userMaybeExists = FriendCodeTable
-            .select { FriendCodeTable.user eq user.id }
-            .firstOrNull()
-
-        return if (userMaybeExists != null) {
-            "I already have your code, use the \"update\" action if you want to change it"
-        } else if (code == null) {
-            "The code you provided appears to be invalid"
-        } else {
-            FriendCodeTable.insert {
-                it[FriendCodeTable.user] = user.id
-                it[FriendCodeTable.code] = code
-                it[createdOn] = LocalDate.now()
-            }
-            "I added your friend code to my database"
-        }
-    }
-
-    private fun updateCode(user: User, code: String?): String {
-        if (code == null) {
-            return "That's an invalid code"
-        }
-        FriendCodeTable.update({FriendCodeTable.user eq user.id }) {
-            it[FriendCodeTable.code] = code
-        }
-        return "Updated your code"
-    }
     private fun validateFriendCodeFormat(code: String?): Boolean =
         code?.takeIf { friendCodeRegex.matches(code) } != null
 }

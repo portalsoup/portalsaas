@@ -2,8 +2,8 @@ package com.portalsoup.saas.db
 
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.extensions.Logging
-import com.portalsoup.saas.util.Retrier
 import com.portalsoup.saas.extensions.log
+import com.portalsoup.saas.util.Retrier
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
@@ -16,13 +16,13 @@ class DatabaseFactory: Logging {
      * The database's entrypoint, this configures the connection pool with Hikari, and performs necessary migrations
      * using Flyway.
      */
-    fun init(appConfig: AppConfig) {
+    fun init() {
         val hikariConfig = HikariConfig().apply {
-            jdbcUrl = appConfig.jdbcConfig.url
-            username = appConfig.jdbcConfig.username
-            password = appConfig.jdbcConfig.password
-            driverClassName = appConfig.jdbcConfig.driver
-            maximumPoolSize = appConfig.jdbcConfig.maxPool
+            jdbcUrl = AppConfig.jdbc.url
+            username = AppConfig.jdbc.username
+            password = AppConfig.jdbc.password
+            driverClassName = AppConfig.jdbc.driver
+            maximumPoolSize = AppConfig.jdbc.maxPool
             isAutoCommit = true
             addDataSourceProperty( "cachePrepStmts" , "true" )
             addDataSourceProperty( "prepStmtCacheSize" , "250" )

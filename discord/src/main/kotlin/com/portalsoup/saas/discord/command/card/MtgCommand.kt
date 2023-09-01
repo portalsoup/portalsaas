@@ -1,9 +1,8 @@
 package com.portalsoup.saas.discord.command.card
 
+import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
 import com.portalsoup.saas.extensions.Logging
 import com.portalsoup.saas.extensions.log
-import com.portalsoup.saas.data.tables.scryfall.SetType
-import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
 import com.portalsoup.saas.service.MtgManager
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
@@ -47,11 +46,7 @@ object MtgCommand: AbstractDiscordSlashCommand(), Logging {
 
     override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.name == "mtg" && event.focusedOption.name == "set") {
-                val sets =
-                runBlocking { mtgManager.getSetsAutocomplete() }
-                    .filter { it.setType == SetType.EXPANSION || it.setType == SetType.CORE || it.setType == SetType.COMMANDER }
-                    .map { it.name }
-                    .filter { it.lowercase().startsWith(event.focusedOption.value.lowercase()) }
+            val sets = runBlocking { mtgManager.getSetsAutocomplete(event.focusedOption.value) }
             log().info("Got a list of sets to autocomplete...: $sets")
 
             event.replyChoiceStrings(sets.take(25)).queue()

@@ -1,13 +1,7 @@
 package com.portalsoup.saas.core.discord
 
-import com.portalsoup.saas.config.AppConfig
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-
-object DiscordChatGPT: KoinComponent {
-
-    val appConfig by inject<AppConfig>()
+object DiscordChatGPT {
 
     fun gpt(prompt: String): String? {
         return "I got this"
@@ -17,7 +11,7 @@ object DiscordChatGPT: KoinComponent {
 //            .maxTokens(128)
 //            .build()
 //
-//        val key = appConfig.openaiToken ?: return null
+//        val key = AppConfig.openaiToken ?: return null
 //
 //        val openai = OpenAI(key)
 //

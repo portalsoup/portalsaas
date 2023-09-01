@@ -9,9 +9,11 @@ data class DepConstraint(val scope: String, val notation: String, val type: Cons
 object Versions {
     val ktor = "2.3.1"
     val exposed = "0.41.1"
+    val kotlinx = "1.7.3"
 }
 
 val dependenciesList = listOf(
+    DepConstraint("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core", PREFER, Versions.kotlinx),
     DepConstraint("implementation", "io.ktor:ktor-server-core", PREFER, Versions.ktor),
     DepConstraint("implementation", "io.ktor:ktor-server-netty-jvm", PREFER, Versions.ktor),
     DepConstraint("implementation", "io.ktor:ktor-client-core", PREFER, Versions.ktor),

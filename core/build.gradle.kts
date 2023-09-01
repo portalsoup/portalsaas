@@ -1,5 +1,6 @@
 plugins {
-    id("java")
+    kotlin("jvm") version "1.7.21"
+    kotlin("plugin.serialization") version "1.7.21"
 }
 
 group = "org.example"
@@ -10,18 +11,20 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-cio")
     implementation("io.ktor:ktor-network-tls-certificates")
+    implementation("io.ktor:ktor-client-content-negotiation")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+
+    implementation("io.ktor:ktor-server-core")
+    implementation("io.ktor:ktor-server-netty-jvm")
     implementation("io.ktor:ktor-server-cors")
     implementation("io.ktor:ktor-auth-jwt")
     implementation("io.ktor:ktor-server-sessions")
     implementation("io.ktor:ktor-server-content-negotiation")
-    implementation("io.ktor:ktor-client-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
 
     implementation("org.quartz-scheduler:quartz")
 

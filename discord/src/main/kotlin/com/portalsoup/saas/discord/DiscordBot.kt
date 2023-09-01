@@ -1,16 +1,14 @@
 package com.portalsoup.saas.discord
 
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.extensions.Logging
 import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
 import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.FriendCodeCommand
 import com.portalsoup.saas.discord.command.gpx.RenderGpxMapCommand
 import com.portalsoup.saas.discord.command.gpx.UploadGpxCommand
+import com.portalsoup.saas.extensions.Logging
 import net.dv8tion.jda.api.JDA
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.time.OffsetDateTime
 import java.time.ZoneId
 
@@ -18,20 +16,17 @@ import java.time.ZoneId
 /**
  * The main Discord bot entrypoint.  This class should only be instantiated when appConfig.discordToken is provided.
  */
-class DiscordBot: KoinComponent, Logging {
-
-    private val client by inject<JDA>()
-    private val appConfig by inject<AppConfig>()
+class DiscordBot(private val client: JDA): Logging {
 
     /**
      * This is the bot entrypoint
      */
     fun init() {
 
-        val guild = client.getGuildById(appConfig.discord.guildID)
+        val guild = client.getGuildById(AppConfig.discord.guildID)
 
         guild
-            ?.getTextChannelById(appConfig.discord.guildVIPChannelID)
+            ?.getTextChannelById(AppConfig.discord.guildVIPChannelID)
             ?.sendMessage(wakeupMessage())
             ?.queue()
 

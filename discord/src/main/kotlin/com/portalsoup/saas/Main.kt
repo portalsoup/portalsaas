@@ -1,12 +1,13 @@
 package com.portalsoup.saas
 
-import io.ktor.server.netty.*
-import org.quartz.impl.StdSchedulerFactory
+
+import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.core.discord.DiscordClientBuilder
+import com.portalsoup.saas.discord.DiscordBot
 
 fun main(args: Array<String>) {
-    scheduler.start()
-    EngineMain.main(args)
-    scheduler.shutdown()
+    if (AppConfig.discord.token?.isNotEmpty() == true) {
+        val client = DiscordClientBuilder.build()
+        DiscordBot(client).init()
+    }
 }
-
-val scheduler = StdSchedulerFactory.getDefaultScheduler() ?: throw RuntimeException("Failed to initialize quartz factory")
