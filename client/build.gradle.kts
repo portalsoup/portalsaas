@@ -1,8 +1,8 @@
-rootProject.tasks {
-    getByName("processResources") {
-        mustRunAfter("client:package")
-    }
-}
+//rootProject.tasks {
+//    getByName("processResources") {
+//        mustRunAfter("client:package")
+//    }
+//}
 
 tasks {
     create<Copy>("package") {

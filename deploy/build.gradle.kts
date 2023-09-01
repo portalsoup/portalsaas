@@ -35,24 +35,24 @@ val stravaToken: String by project
 val myStravaAthleteID: String by project
 
 // Shortcuts
-val ansibleDir = "$rootDir/infrastructure/ansible/"
-val terraformDir = "$rootDir/infrastructure/terraform/"
-val pathToAnsibleInventory = "$ansibleDir/inventory/"
-val pathToResources = "$rootDir/src/main/resources/"
+val ansibleDir = rootDir.resolve("infrastructure/ansible/")
+val terraformDir = rootDir.resolve("infrastructure/terraform/")
+val pathToAnsibleInventory = ansibleDir.resolve("inventory/").toString()
+val pathToResources = rootDir.resolve("discord/src/main/resources/")
 
-rootProject.tasks {
-    getByName("processResources") {
-        mustRunAfter("deploy:ktor-config")
-    }
-
-    getByName("compileKotlin") {
-        mustRunAfter("deploy:ktor-config")
-    }
-
-    getByName("build") {
-        mustRunAfter("deploy:ktor-config")
-    }
-}
+//project(":discord").tasks {
+//    getByName("processResources") {
+//        mustRunAfter("deploy:ktor-config")
+//    }
+//
+//    getByName("compileKotlin") {
+//        mustRunAfter("deploy:ktor-config")
+//    }
+//
+//    getByName("build") {
+//        mustRunAfter("deploy:ktor-config")
+//    }
+//}
 
 tasks {
     register<Delete>("clean") {
@@ -98,10 +98,10 @@ tasks {
             File("$terraformDir/data.tf").exists()
         }
 
-        // configure stdin for prompts
-        rootProject.tasks.getByName<JavaExec>("run") {
-            standardInput = System.`in`
-        }
+        // configure stdin for prompts TODO prompts are broke for now
+//        rootProject.tasks.getByName<JavaExec>("run") {
+//            standardInput = System.`in`
+//        }
 
         doLast {
             val planResult = project.exec {
@@ -298,7 +298,7 @@ tasks.register("ktor-config") {
         val rawTemplate: String = File(pathToTemplate)
             .takeIf { it.exists() }
             ?.readText(Charsets.UTF_8)
-            ?: throw GradleException("application.conf.hbs not found!")
+            ?: throw GradleException("application.conf.hbs not found at the path $pathToTemplate!")
         val handlebars = Handlebars()
         val template = handlebars.compileInline(rawTemplate)
 

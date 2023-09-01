@@ -17,7 +17,7 @@ services:
       - "8080:80"
       - "5006:5006"
     volumes:
-      - "./build/libs:/app"
+      - "./discord/build/libs:/app"
     depends_on:
       - db
   db:
