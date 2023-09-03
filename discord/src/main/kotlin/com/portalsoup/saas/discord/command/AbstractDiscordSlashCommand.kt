@@ -1,6 +1,6 @@
 package com.portalsoup.saas.discord.command
 
-import com.portalsoup.saas.appConfig
+import com.portalsoup.saas.discord.appConfig
 import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
