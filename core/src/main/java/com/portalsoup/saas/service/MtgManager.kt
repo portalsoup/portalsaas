@@ -1,10 +1,10 @@
 package com.portalsoup.saas.service
 
+import com.portalsoup.saas.api.Api
 import com.portalsoup.saas.db.tables.scryfall.MtgSet
 import com.portalsoup.saas.db.tables.scryfall.MtgSetTable
 import com.portalsoup.saas.db.tables.scryfall.SetType
 import com.portalsoup.saas.extensions.*
-import com.portalsoup.saas.web.Api
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 /**
  * Collect functionality to interact with scryfall's API
  */
-class MtgManager: Logging {
+class MtgManager: Logging, Api() {
 
     private val namedSearchUrl = "https://api.scryfall.com/cards/named"
     private val searchUrl = "https://api.scryfall.com/cards/search"
@@ -77,7 +77,7 @@ class MtgManager: Logging {
     suspend fun searchForCard(term: String): Deferred<JSONArray?> {
         return coroutineScope {
             async {
-                runCatching { JSONObject(Api.makeRequest("$searchUrl?q=$term")) }.getOrNull()?.getJSONArray("data")
+                runCatching { JSONObject(makeRequest("$searchUrl?q=$term")) }.getOrNull()?.getJSONArray("data")
             }
         }
     }
@@ -88,13 +88,15 @@ class MtgManager: Logging {
     private suspend fun getRawCardAsync(term: String, set: String?): Deferred<JSONObject?> = coroutineScope {
         val set = set?.let { transaction { MtgSet.find { MtgSetTable.name eq set }.firstOrNull() } }
         val setUrlPart = set?.let { "&set=${it.code}" } ?: ""
-        async { runCatching { JSONObject(Api.makeRequest("$namedSearchUrl?fuzzy=$term$setUrlPart")) }.getOrNull() }
+        val url = "$namedSearchUrl?fuzzy=$term$setUrlPart"
+
+        async { runCatching { JSONObject(makeRequest(url)) }.getOrNull() }
     }
 
     suspend fun getListOfCardSetsFromScryfall(): Deferred<JSONArray?> = coroutineScope {
         async {
             runCatching {
-                JSONObject(Api.makeRequest(setsUrl)).getJSONArray("data")
+                JSONObject(makeRequest(setsUrl)).getJSONArray("data")
             }.getOrNull()
         }
     }

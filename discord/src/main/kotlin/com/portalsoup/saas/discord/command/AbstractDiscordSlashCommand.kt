@@ -1,6 +1,6 @@
 package com.portalsoup.saas.discord.command
 
-import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.appConfig
 import com.portalsoup.saas.discord.command.pricecharting.VideoGameLookupCommand
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -12,9 +12,7 @@ abstract class AbstractDiscordSlashCommand: ListenerAdapter() {
     abstract val commandData: CommandData
 
     fun private(event: SlashCommandInteractionEvent, l: ListenerAdapter.() -> Unit) {
-        println("In private wrapper")
         if (isMatch(event)) {
-            println("Matched event")
             Private(event)() {
                 this.l()
             }
@@ -57,11 +55,11 @@ sealed class Scope(val event: SlashCommandInteractionEvent) {
 
 class Private(event: SlashCommandInteractionEvent): Scope(event) {
     override fun shouldRun(event: SlashCommandInteractionEvent): Boolean {
-        return AppConfig.discord.userID == event.user.id
+        return appConfig.discord.user.id == event.user.id
     }
 }
 class Guild(event: SlashCommandInteractionEvent): Scope(event) {
     override fun shouldRun(event: SlashCommandInteractionEvent): Boolean {
-        return AppConfig.discord.guildID == (event.guild?.id ?: return false)
+        return appConfig.discord.guild.id == (event.guild?.id ?: return false)
     }
 }

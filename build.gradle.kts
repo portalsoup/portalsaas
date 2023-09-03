@@ -14,6 +14,7 @@ object Versions {
 
 val dependenciesList = listOf(
     DepConstraint("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core", PREFER, Versions.kotlinx),
+    DepConstraint("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json", PREFER, "1.6.0"),
     DepConstraint("implementation", "io.ktor:ktor-server-core", PREFER, Versions.ktor),
     DepConstraint("implementation", "io.ktor:ktor-server-netty-jvm", PREFER, Versions.ktor),
     DepConstraint("implementation", "io.ktor:ktor-client-core", PREFER, Versions.ktor),

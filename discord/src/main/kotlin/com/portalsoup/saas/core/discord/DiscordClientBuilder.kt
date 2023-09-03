@@ -1,11 +1,11 @@
 package com.portalsoup.saas.core.discord
 
-import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.appConfig
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 
 object DiscordClientBuilder {
 
-    fun build(): JDA = JDABuilder.createDefault(AppConfig.discord.token).build()
+    fun build(): JDA = JDABuilder.createDefault(appConfig.discord.token).build()
 
 }

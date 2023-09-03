@@ -1,13 +1,13 @@
 package com.portalsoup.saas.service
 
+import com.portalsoup.saas.api.Api
 import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.extensions.Logging
-import com.portalsoup.saas.extensions.log
-import com.portalsoup.saas.util.measureDuration
 import com.portalsoup.saas.db.tables.pricecharting.VideoGame
 import com.portalsoup.saas.db.tables.pricecharting.VideoGamePriceTable
 import com.portalsoup.saas.db.tables.pricecharting.VideoGameTable
-import io.ktor.client.*
+import com.portalsoup.saas.extensions.Logging
+import com.portalsoup.saas.extensions.log
+import com.portalsoup.saas.util.measureDuration
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -16,8 +16,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
@@ -26,10 +24,7 @@ import kotlin.random.Random
 /**
  * Collect functionality to interact with Pricecharting's API
  */
-class PriceChartingManager: KoinComponent, Logging {
-
-    private val appConfig by inject<AppConfig>()
-    private val httpClient by inject<HttpClient>()
+class PriceChartingManager(val appConfig: AppConfig): Logging, Api() {
 
     private val gamesPersisted = AtomicInteger(0)
     private val gamePricesPersisted = AtomicInteger(0)
@@ -42,9 +37,9 @@ class PriceChartingManager: KoinComponent, Logging {
     fun updateLoosePriceGuide() {
         val durationResult = measureDuration {
             val tmpFile = File.createTempFile("pricecharting", Random.nextDouble().toString())
-            val url = "https://www.pricecharting.com/price-guide/download-custom?t=${appConfig.pricechartingToken}"
+            val url = "https://www.pricecharting.com/price-guide/download-custom?t=${appConfig.pricecharting.token}"
             runBlocking {
-                httpClient.prepareGet(url).execute { response ->
+                client.prepareGet(url).execute { response ->
                     val channel: ByteReadChannel = response.bodyAsChannel()
 
                     while (!channel.isClosedForRead) {

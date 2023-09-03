@@ -3,12 +3,8 @@ package com.portalsoup.saas.quartz
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.extensions.Logging
 import com.portalsoup.saas.extensions.log
-import com.portalsoup.saas.quartz.job.PriceChartingUpdateJob
 import com.portalsoup.saas.quartz.job.RssPoller
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.quartz.*
-import org.quartz.CronScheduleBuilder.dailyAtHourAndMinute
 import org.quartz.JobBuilder.newJob
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
@@ -17,25 +13,23 @@ import java.util.*
 /**
  * The entrypoint and configuration of Quartz jobs
  */
-object QuartzModule: KoinComponent, Logging {
+class QuartzModule(val appConfig: AppConfig): Logging {
 
     val scheduler = StdSchedulerFactory.getDefaultScheduler() ?: throw RuntimeException("Failed to initialize quartz factory")
-
-    private val appConfig by inject<AppConfig>()
 
     /**
      * Start all Quartz jobs
      */
     operator fun invoke() {
-        log().info("initializing ")
-        if (! appConfig.pricechartingToken.isNullOrEmpty()) {
-            initJob(
-                PriceChartingUpdateJob::class.java,
-                "update-price-guide",
-                "pricecharting",
-                dailyAtHourAndMinute(0, 0)
-            )
-        }
+        log().info("initializing Quartz")
+//        if (! appConfig.pricecharting.token.isNullOrEmpty()) {
+//            initJob(
+//                PriceChartingUpdateJob::class.java,
+//                "update-price-guide",
+//                "pricecharting",
+//                dailyAtHourAndMinute(0, 0)
+//            )
+//        }
 
         initJob(
             RssPoller::class.java,

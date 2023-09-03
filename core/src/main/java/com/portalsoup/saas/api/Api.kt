@@ -1,17 +1,18 @@
-package com.portalsoup.saas.web
+package com.portalsoup.saas.api
 
 import com.portalsoup.saas.extensions.Logging
 import com.portalsoup.saas.extensions.log
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-object Api: KoinComponent, Logging {
+abstract class Api: Logging {
 
-    private val client by inject<HttpClient>()
+    internal val client by lazy {
+        HttpClient(CIO)
+    }
 
 
     suspend fun get(url: String, queryHeaders: Map<String, String> = mapOf()): HttpResponse {
@@ -21,14 +22,20 @@ object Api: KoinComponent, Logging {
     }
 
     suspend fun makeRequest(url: String, queryHeaders: Map<String, String> = mapOf()): String {
+        println("Making request...")
         val response: HttpResponse = client.get(url) {
             headers { queryHeaders.onEach { append(it.key, it.value) } }
         }
 
+        println("Got a response! $response")
+
         if (response.status.value in 200..299) {
             log().debug("Returning response:\n\n$response\n\n")
-            return response.body()
+            val body: String =  response.body()
+            println(body)
+            return body
         } else {
+            println("Didn't get a response... ${response.status.value}")
             throw NoResultsFoundException()
         }
     }

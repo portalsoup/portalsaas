@@ -1,0 +1,31 @@
+{
+  "jdbc": {
+    "url": "jdbc:postgresql://{{host}}:{{port}}/{{db}}?sslmode=require",
+    "driver": "{{driver}}",
+    "username": "{{username}}",
+    "password": "{{password}}",
+    "maxPool": "{{maxPool}}"
+  },
+  "discord": {
+    "token": "{{discordToken}}",
+    "user": {
+      "id": "{{myDiscordID}}"
+    },
+    "guild": {
+      "id": "{{myDiscordGuildID}}",
+      "vipId": "{{myDiscordGuildVIPChannelID}}"
+    }
+  },
+  "openAI": {
+    "token": "{{openaiToken}}"
+
+  },
+  "pricecharting": {
+    "token": "{{pricechartingToken}}"
+
+  },
+  "strava": {
+    "token": "{{stravaToken}}",
+    "athleteId": "{{stravaAthleteID}}"
+  }
+}

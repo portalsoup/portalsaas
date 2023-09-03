@@ -1,25 +1,20 @@
 package com.portalsoup.saas.service
 
+import com.portalsoup.saas.api.Api
 import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.dto.gpx.Route
 import com.portalsoup.saas.extensions.Logging
 import com.portalsoup.saas.extensions.log
-import com.portalsoup.saas.dto.gpx.Route
-import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class StravaManager: Logging, KoinComponent {
+class StravaManager(val appConfig: AppConfig): Logging, Api() {
 
     val baseUrl = "https://www.strava.com/api/v3"
-
-    val appConfig by inject<AppConfig>()
-    val client by inject<HttpClient>()
 
     /*
 
@@ -30,7 +25,7 @@ class StravaManager: Logging, KoinComponent {
 
     suspend fun listRoutesAPI(): List<Route> {
         val response: List<Route> = runBlocking {
-            client.get("$baseUrl/athletes/${appConfig.strava.athleteID}/routes?client_id=") {
+            client.get("$baseUrl/athletes/${appConfig.strava.athleteId}/routes?client_id=") {
                 formData(
                     FormPart("Authorization", "Bearer: ${getAccessToken().accessToken}")
                 )

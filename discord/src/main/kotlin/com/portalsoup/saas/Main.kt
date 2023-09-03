@@ -4,10 +4,22 @@ package com.portalsoup.saas
 import com.portalsoup.saas.config.AppConfig
 import com.portalsoup.saas.core.discord.DiscordClientBuilder
 import com.portalsoup.saas.discord.DiscordBot
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 
-fun main(args: Array<String>) {
-    if (AppConfig.discord.token?.isNotEmpty() == true) {
-        val client = DiscordClientBuilder.build()
-        DiscordBot(client).init()
-    }
-}
+val appConfig = loadConfig()
+
+fun main() = appConfig.discord.token
+    ?.takeIf { it.isNotEmpty() }
+    ?.let { DiscordClientBuilder.build() }
+    ?.let { DiscordBot(it, appConfig) }
+    ?.init()
+    ?: throw MissingApplicationPropertyException("Missing discord API token from properties file!")
+
+@OptIn(ExperimentalSerializationApi::class)
+private fun loadConfig(): AppConfig = AppConfig::class.java.getResourceAsStream(AppConfig.PROPS_PATH)
+    ?.let { Json.decodeFromStream(it) }
+    ?: throw RuntimeException("Application properties file not found.")
+
+data class MissingApplicationPropertyException(override val message: String, val reason: Throwable? = null): RuntimeException(message, reason)

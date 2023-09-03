@@ -16,13 +16,13 @@ class DatabaseFactory: Logging {
      * The database's entrypoint, this configures the connection pool with Hikari, and performs necessary migrations
      * using Flyway.
      */
-    fun init() {
+    fun init(appConfig: AppConfig) {
         val hikariConfig = HikariConfig().apply {
-            jdbcUrl = AppConfig.jdbc.url
-            username = AppConfig.jdbc.username
-            password = AppConfig.jdbc.password
-            driverClassName = AppConfig.jdbc.driver
-            maximumPoolSize = AppConfig.jdbc.maxPool
+            jdbcUrl = appConfig.jdbc.url
+            username = appConfig.jdbc.username
+            password = appConfig.jdbc.password
+            driverClassName = appConfig.jdbc.driver
+            maximumPoolSize = appConfig.jdbc.maxPool
             isAutoCommit = true
             addDataSourceProperty( "cachePrepStmts" , "true" )
             addDataSourceProperty( "prepStmtCacheSize" , "250" )

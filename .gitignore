@@ -12,3 +12,4 @@ gradle.properties
 **/node_modules
 **/bundle.js
 **/resources/**/static/**/*
+**/application.json

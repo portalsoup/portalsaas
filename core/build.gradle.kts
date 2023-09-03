@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.7.21"
-    kotlin("plugin.serialization") version "1.7.21"
+    kotlin("jvm") version "1.9.0" // or kotlin("multiplatform") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 group = "org.example"
@@ -19,13 +19,6 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
 
-    implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-netty-jvm")
-    implementation("io.ktor:ktor-server-cors")
-    implementation("io.ktor:ktor-auth-jwt")
-    implementation("io.ktor:ktor-server-sessions")
-    implementation("io.ktor:ktor-server-content-negotiation")
-
     implementation("org.quartz-scheduler:quartz")
 
     implementation("com.zaxxer:HikariCP")
@@ -36,9 +29,6 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao")
     implementation("org.jetbrains.exposed:exposed-java-time")
     implementation("org.jetbrains.exposed:exposed-jdbc")
-
-    implementation("io.insert-koin:koin-core")
-
 
     //gpx
     implementation("io.jenetics:jpx")

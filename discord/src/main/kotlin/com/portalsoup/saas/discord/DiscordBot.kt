@@ -16,17 +16,16 @@ import java.time.ZoneId
 /**
  * The main Discord bot entrypoint.  This class should only be instantiated when appConfig.discordToken is provided.
  */
-class DiscordBot(private val client: JDA): Logging {
-
+class DiscordBot(private val client: JDA, private val appConfig: AppConfig): Logging {
     /**
      * This is the bot entrypoint
      */
     fun init() {
 
-        val guild = client.getGuildById(AppConfig.discord.guildID)
+        val guild = client.getGuildById(appConfig.discord.guild.id)
 
         guild
-            ?.getTextChannelById(AppConfig.discord.guildVIPChannelID)
+            ?.getTextChannelById(appConfig.discord.guild.vipId)
             ?.sendMessage(wakeupMessage())
             ?.queue()
 
