@@ -38,8 +38,12 @@ val myStravaAthleteID: String by project
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":common"))
+    implementation(project(":data"))
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    implementation(kotlin("reflect"))
 
     //gpx
     implementation("io.jenetics:jpx")

@@ -2,7 +2,7 @@ package com.portalsoup.saas.discord.command.pricecharting
 
 import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.core.extensions.log
-import com.portalsoup.saas.core.db.dao.PriceChartingDAO
+import com.portalsoup.saas.data.dao.PriceChartingDAO
 import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent

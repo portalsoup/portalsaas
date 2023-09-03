@@ -9,6 +9,5 @@ pluginManagement {
 
 rootProject.name = "portalsaas"
 
-include("deploy", "client", "discord")
-include("core")
-include("api")
+include("core", "deploy", "client", "discord", "data")
+include("common")

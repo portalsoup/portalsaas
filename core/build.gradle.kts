@@ -3,21 +3,27 @@ plugins {
     kotlin("plugin.serialization") version "1.9.0"
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation(project(":data"))
+    implementation(project(":common"))
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation(kotlin("reflect"))
+
+    implementation(platform("io.arrow-kt:arrow-stack:1.2.0"))
+    // arrow versions are dictated by arrow-stack above
+    implementation("io.arrow-kt:arrow-core")
+    implementation("io.arrow-kt:arrow-fx-coroutines")
 
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-cio")
     implementation("io.ktor:ktor-network-tls-certificates")
     implementation("io.ktor:ktor-client-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
 
     implementation("org.quartz-scheduler:quartz")
 
@@ -40,13 +46,11 @@ dependencies {
 
     implementation("com.rometools:rome")
 
+    implementation("net.dv8tion:JDA")
+
+
     // math processing
     implementation("com.notkamui.libs:keval")
-
-    // Discord deps
-    implementation("net.dv8tion:JDA")
-    implementation("com.sedmelluq:lavaplayer")
-    implementation("com.cjcrafter:openai")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter")
