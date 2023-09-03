@@ -1,7 +1,7 @@
 package com.portalsoup.saas.core.util
 
-import com.portalsoup.saas.extensions.Logging
-import com.portalsoup.saas.extensions.log
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import java.lang.Exception
 import java.lang.RuntimeException
 

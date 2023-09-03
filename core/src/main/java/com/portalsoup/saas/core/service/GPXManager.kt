@@ -1,7 +1,7 @@
 package com.portalsoup.saas.core.service
 
-import com.portalsoup.saas.db.tables.gpx.Coordinate
-import com.portalsoup.saas.db.tables.gpx.Route
+import com.portalsoup.saas.core.db.tables.gpx.Coordinate
+import com.portalsoup.saas.core.db.tables.gpx.Route
 import io.jenetics.jpx.GPX
 import io.jenetics.jpx.TrackSegment
 import org.jetbrains.exposed.sql.transactions.transaction

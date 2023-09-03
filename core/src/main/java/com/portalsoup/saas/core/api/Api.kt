@@ -1,7 +1,7 @@
 package com.portalsoup.saas.core.api
 
-import com.portalsoup.saas.extensions.Logging
-import com.portalsoup.saas.extensions.log
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*

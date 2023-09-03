@@ -1,9 +1,9 @@
 package com.portalsoup.saas.core.quartz
 
-import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.extensions.Logging
-import com.portalsoup.saas.extensions.log
-import com.portalsoup.saas.quartz.job.RssPoller
+import com.portalsoup.saas.core.config.AppConfig
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
+import com.portalsoup.saas.core.quartz.job.RssPoller
 import org.quartz.*
 import org.quartz.JobBuilder.newJob
 import org.quartz.TriggerBuilder.newTrigger

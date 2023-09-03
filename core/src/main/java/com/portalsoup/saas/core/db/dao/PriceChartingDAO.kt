@@ -1,6 +1,6 @@
 package com.portalsoup.saas.core.db.dao
 
-import com.portalsoup.saas.db.execAndMap
+import com.portalsoup.saas.core.db.execAndMap
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDate
 

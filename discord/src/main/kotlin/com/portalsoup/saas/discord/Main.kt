@@ -1,7 +1,7 @@
 package com.portalsoup.saas.discord
 
 
-import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.core.config.AppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream

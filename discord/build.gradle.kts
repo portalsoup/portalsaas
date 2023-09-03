@@ -64,7 +64,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.portalsoup.saas.MainKt")
+    mainClass.set("com.portalsoup.saas.discord.MainKt")
 }
 
 tasks {
@@ -79,7 +79,7 @@ tasks {
         archiveClassifier.set("")
         mergeServiceFiles()
         manifest {
-            attributes(mapOf("Main-Class" to "com.portalsoup.saas.MainKt"))
+            attributes(mapOf("Main-Class" to "com.portalsoup.saas.discord.MainKt"))
         }
     }
 

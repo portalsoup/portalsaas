@@ -1,6 +1,6 @@
 package com.portalsoup.saas.discord.command.gpx
 
-import com.portalsoup.saas.extensions.Logging
+import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType

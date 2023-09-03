@@ -1,13 +1,13 @@
 package com.portalsoup.saas.discord
 
-import com.portalsoup.saas.config.AppConfig
+import com.portalsoup.saas.core.config.AppConfig
+import com.portalsoup.saas.core.extensions.Logging
 import com.portalsoup.saas.discord.command.DiceRollCommand
 import com.portalsoup.saas.discord.command.MathCommand
 import com.portalsoup.saas.discord.command.card.MtgCommand
 import com.portalsoup.saas.discord.command.friendcode.FriendCodeCommand
 import com.portalsoup.saas.discord.command.gpx.RenderGpxMapCommand
 import com.portalsoup.saas.discord.command.gpx.UploadGpxCommand
-import com.portalsoup.saas.extensions.Logging
 import net.dv8tion.jda.api.JDA
 import java.time.OffsetDateTime
 import java.time.ZoneId

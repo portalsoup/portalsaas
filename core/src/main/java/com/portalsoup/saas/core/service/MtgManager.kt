@@ -1,10 +1,9 @@
 package com.portalsoup.saas.core.service
 
-import com.portalsoup.saas.core.api.Api
-import com.portalsoup.saas.db.tables.scryfall.MtgSet
-import com.portalsoup.saas.db.tables.scryfall.MtgSetTable
-import com.portalsoup.saas.db.tables.scryfall.SetType
-import com.portalsoup.saas.extensions.*
+import com.portalsoup.saas.core.db.tables.scryfall.MtgSet
+import com.portalsoup.saas.core.db.tables.scryfall.MtgSetTable
+import com.portalsoup.saas.core.db.tables.scryfall.SetType
+import com.portalsoup.saas.core.extensions.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

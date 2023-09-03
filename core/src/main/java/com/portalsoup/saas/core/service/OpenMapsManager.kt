@@ -1,6 +1,6 @@
 package com.portalsoup.saas.core.service
 
-import com.portalsoup.saas.extensions.Logging
+import com.portalsoup.saas.core.extensions.Logging
 import io.jenetics.jpx.GPX
 import org.openstreetmap.gui.jmapviewer.Coordinate
 import org.openstreetmap.gui.jmapviewer.JMapViewerTree

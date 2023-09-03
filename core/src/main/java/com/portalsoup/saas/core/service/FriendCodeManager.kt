@@ -1,8 +1,8 @@
 package com.portalsoup.saas.core.service
 
-import com.portalsoup.saas.db.tables.FriendCode
-import com.portalsoup.saas.db.tables.FriendCodeTable
-import com.portalsoup.saas.extensions.Logging
+import com.portalsoup.saas.core.db.tables.FriendCode
+import com.portalsoup.saas.core.db.tables.FriendCodeTable
+import com.portalsoup.saas.core.extensions.Logging
 import net.dv8tion.jda.api.entities.User
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere

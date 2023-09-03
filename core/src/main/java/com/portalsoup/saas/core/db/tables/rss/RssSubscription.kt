@@ -1,7 +1,7 @@
 package com.portalsoup.saas.core.db.tables.rss
 
-import com.portalsoup.saas.db.tables.DiscordUser
-import com.portalsoup.saas.db.tables.DiscordUserTable
+import com.portalsoup.saas.core.db.tables.DiscordUser
+import com.portalsoup.saas.core.db.tables.DiscordUserTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

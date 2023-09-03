@@ -1,7 +1,7 @@
 package com.portalsoup.saas.discord.command.friendcode
 
 import com.portalsoup.saas.discord.command.AbstractDiscordSlashCommand
-import com.portalsoup.saas.service.FriendCodeManager
+import com.portalsoup.saas.core.service.FriendCodeManager
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType

@@ -1,10 +1,9 @@
 package com.portalsoup.saas.core.service
 
-import com.portalsoup.saas.core.api.Api
-import com.portalsoup.saas.config.AppConfig
-import com.portalsoup.saas.dto.gpx.Route
-import com.portalsoup.saas.extensions.Logging
-import com.portalsoup.saas.extensions.log
+import com.portalsoup.saas.core.config.AppConfig
+import com.portalsoup.saas.core.dto.gpx.Route
+import com.portalsoup.saas.core.extensions.Logging
+import com.portalsoup.saas.core.extensions.log
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
